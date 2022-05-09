@@ -3,7 +3,7 @@ from __future__ import print_function,division
 import sys
 import numpy as np
 
-import torch
+import torch, gc
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data
@@ -67,9 +67,11 @@ def denoise(model, x, patch_size=-1, padding=128):
     if use_patch:
         return denoise_patches(model, x, patch_size, padding=padding)
 
+    torch.cuda.empty_cache()
     with torch.no_grad():
         x = x.unsqueeze(0).unsqueeze(0)
-        y = model(x).squeeze()
+        t = model(x)
+        y = t.squeeze()
 
     return y
 
