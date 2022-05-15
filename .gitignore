@@ -1,3 +1,4 @@
 denoiser/pretrained/*
 denoiser/trainedModel/*
 denoiser/output/*
+denoiser/noiseExtract/*
