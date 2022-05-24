@@ -377,11 +377,31 @@ class WGAN_GP(object):
         samples = self.G(z)
         samples = samples.mul(0.5).add(0.5)
         samples = samples.data.cpu()
+        print(samples.shape, type(samples))
         grid = utils.make_grid(samples)
         print("Grid of 8x8 images saved to 'dgan_model_image.png'.")
         utils.save_image(grid, 'dgan_model_image.png')
 
-
+    def synthesize_noise(self, startNum, D_model_path, G_model_path):
+        if not os.path.exists('synthesized_noises/'): # directory for mrc files.
+            os.makedirs('synthesized_noises/')
+        if not os.path.exists('synthesized_grid/'): # directory for overview grid images.
+            os.makedirs('synthesized_grid/')
+        self.load_model(D_model_path, G_model_path)
+        z = self.get_torch_variable(torch.randn(self.batch_size, 100, 1, 1))
+        samples = self.G(z)
+        samples = samples.mul(0.5).add(0.5)
+        samples = samples.data.cpu()
+        samplesNP = samples.numpy()
+        for sampleNum in range(self.batch_size):
+            noiseID = startNum + sampleNum
+            noise_out=mrcfile.new('synthesized_noises/synthesized_noise_{}.mrc'.format(str(noiseID)), overwrite=True)
+            noise_out.set_data(samplesNP[sampleNum])
+        grid = utils.make_grid(samples)
+        gridName = 'synthesized_grid/overview_synthesized_{}-{}.png'.format(str(startNum), str(startNum+self.batch_size-1))
+        print("Overview grid of 8x8 images saved to '{}'.".format(gridName))
+        utils.save_image(grid, gridName)
+    
     def calculate_gradient_penalty(self, real_images, fake_images):
         eta = torch.FloatTensor(self.batch_size,1,1,1).uniform_(0,1)
         eta = eta.expand(self.batch_size, real_images.size(1), real_images.size(2), real_images.size(3))

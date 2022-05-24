@@ -68,6 +68,22 @@ def is_noise(arr,x0,x1,y0,y1):
         return isnoise
     # print('True :: std_global: {} | std_1: {} | std_2: {} | std_3: {} | std_4: {} '.format(std_global,std_1,std_2,std_3,std_4))
     return isnoise
+
+def etaPrinter(timeLeft):
+    timeLeftInt = int(timeLeft)
+    print("eta : ", end="")
+    if timeLeftInt > 60:
+        if timeLeftInt > 86400:
+            # Day.
+        else 
+            if timeLeftInt > 3600:
+                # Hour.
+            else:
+                # Minute.
+    else:
+        # Second.
+        print(f"{timeLeftInt} sec.")
+
 denoised_dir=sys.argv[1]  #micrographs
 raw_dir=sys.argv[2]  #raw micrographs
 noise_dir=sys.argv[3]  #noise patches
@@ -86,7 +102,7 @@ script_start = time.time()
 
 for input_file in input_list:
     file_start = time.time()
-    print(os.path.join(denoised_dir,input_file))
+    print("Now extracting from ...", os.path.join(denoised_dir,input_file))
     denoised_img=mrcfile.open(os.path.join(denoised_dir,input_file),permissive=True)
     denoised_img=denoised_img.data
     denoised_img=(denoised_img-np.min(denoised_img))/(np.max(denoised_img)-np.min(denoised_img))*255
@@ -123,7 +139,8 @@ for input_file in input_list:
     print(f"All jobs for {input_file} are done. : {file_n} out of {len(input_list)}")
     file_end = time.time()
     print(f"{file_end - file_start:.5f} sec for this file.")
-    print(f"{file_end - script_start:.5f} sec so far for this file.")
+    eta_calc = (len(input_list) - file_n) * (file_end-script_start)/file_n
+    print(f"{file_end - script_start:.5f} sec so far. eta : {eta_calc:.5f} sec")
     print(noise_patch_n, " out of ", patch_n)
     file_n += 1
 

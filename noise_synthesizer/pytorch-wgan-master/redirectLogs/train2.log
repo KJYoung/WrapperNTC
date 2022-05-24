@@ -1,0 +1,282 @@
+True
+WGAN_GradientPenalty init model.
+True
+Cuda enabled flag: True
+  Discriminator iteration: 0/5, loss_fake: -0.13104787468910217, loss_real: -0.04860033094882965
+  Discriminator iteration: 1/5, loss_fake: -3.321352005004883, loss_real: 0.019906025379896164
+  Discriminator iteration: 2/5, loss_fake: -6.677852153778076, loss_real: 0.23593385517597198
+  Discriminator iteration: 3/5, loss_fake: -10.141157150268555, loss_real: 0.33645063638687134
+  Discriminator iteration: 4/5, loss_fake: -13.857660293579102, loss_real: 1.4011757373809814
+Generator iteration: 0/10000, g_loss: -17.749271392822266
+g_loss: -17.749271392822266
+Models save to ./generator.pkl & ./discriminator.pkl 
+Generator iter: 0
+Time 4.020923614501953
+Wasserstein distance: 15.258835792541504 |Loss D: -5.407007217407227 |Loss G:17.749271392822266 |Loss D Real:1.4011757373809814 |Loss D Fake:-13.857660293579102
+tensor(15.2588, device='cuda:0', grad_fn=<SubBackward0>)
+tensor(-5.4070, device='cuda:0', grad_fn=<AddBackward0>)
+tensor(17.7493, device='cuda:0', grad_fn=<NegBackward>)
+tensor(1.4012, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(-13.8577, device='cuda:0', grad_fn=<MeanBackward0>)
+  Discriminator iteration: 0/5, loss_fake: 1.1817877292633057, loss_real: 2.7217488288879395
+  Discriminator iteration: 1/5, loss_fake: -3.0942306518554688, loss_real: 3.5473082065582275
+  Discriminator iteration: 2/5, loss_fake: -9.958812713623047, loss_real: 3.7350077629089355
+  Discriminator iteration: 3/5, loss_fake: -16.15593719482422, loss_real: 4.174977779388428
+  Discriminator iteration: 4/5, loss_fake: -20.829317092895508, loss_real: 6.380686283111572
+Generator iteration: 1/10000, g_loss: -23.984111785888672
+g_loss: -23.984111785888672
+  Discriminator iteration: 0/5, loss_fake: 4.196965217590332, loss_real: 10.210886001586914
+  Discriminator iteration: 1/5, loss_fake: -5.881263256072998, loss_real: 11.28001880645752
+  Discriminator iteration: 2/5, loss_fake: -19.54306411743164, loss_real: 11.095298767089844
+  Discriminator iteration: 3/5, loss_fake: -26.296419143676758, loss_real: 12.342826843261719
+  Discriminator iteration: 4/5, loss_fake: -29.305267333984375, loss_real: 17.944530487060547
+Generator iteration: 2/10000, g_loss: -31.605499267578125
+g_loss: -31.605499267578125
+  Discriminator iteration: 0/5, loss_fake: 18.374439239501953, loss_real: 23.081268310546875
+  Discriminator iteration: 1/5, loss_fake: 5.137603759765625, loss_real: 24.68239402770996
+  Discriminator iteration: 2/5, loss_fake: -24.38551902770996, loss_real: 22.87032127380371
+  Discriminator iteration: 3/5, loss_fake: -33.67155838012695, loss_real: 22.08823585510254
+  Discriminator iteration: 4/5, loss_fake: -36.78437042236328, loss_real: 26.43935775756836
+Generator iteration: 3/10000, g_loss: -38.864784240722656
+g_loss: -38.864784240722656
+  Discriminator iteration: 0/5, loss_fake: -10.08088493347168, loss_real: 31.178314208984375
+  Discriminator iteration: 1/5, loss_fake: -35.610206604003906, loss_real: 29.769527435302734
+  Discriminator iteration: 2/5, loss_fake: -40.50922393798828, loss_real: 31.675655364990234
+  Discriminator iteration: 3/5, loss_fake: -42.992279052734375, loss_real: 34.65637969970703
+  Discriminator iteration: 4/5, loss_fake: -44.92798614501953, loss_real: 38.514312744140625
+Generator iteration: 4/10000, g_loss: -46.65478515625
+g_loss: -46.65478515625
+  Discriminator iteration: 0/5, loss_fake: -7.753305912017822, loss_real: 41.284969329833984
+  Discriminator iteration: 1/5, loss_fake: -42.241233825683594, loss_real: 40.09611511230469
+  Discriminator iteration: 2/5, loss_fake: -47.82160186767578, loss_real: 39.79877471923828
+  Discriminator iteration: 3/5, loss_fake: -50.013587951660156, loss_real: 42.167510986328125
+  Discriminator iteration: 4/5, loss_fake: -51.7703742980957, loss_real: 45.52983856201172
+Generator iteration: 5/10000, g_loss: -53.60206604003906
+g_loss: -53.60206604003906
+  Discriminator iteration: 0/5, loss_fake: -35.74903869628906, loss_real: 48.22369384765625
+  Discriminator iteration: 1/5, loss_fake: -50.262874603271484, loss_real: 48.90000915527344
+  Discriminator iteration: 2/5, loss_fake: -54.410240173339844, loss_real: 49.97071838378906
+  Discriminator iteration: 3/5, loss_fake: -56.582462310791016, loss_real: 51.77745819091797
+  Discriminator iteration: 4/5, loss_fake: -58.37956619262695, loss_real: 53.84158706665039
+Generator iteration: 6/10000, g_loss: -60.04084777832031
+g_loss: -60.04084777832031
+  Discriminator iteration: 0/5, loss_fake: -34.62391662597656, loss_real: 56.131675720214844
+  Discriminator iteration: 1/5, loss_fake: -58.214698791503906, loss_real: 55.44428253173828
+  Discriminator iteration: 2/5, loss_fake: -61.433326721191406, loss_real: 55.55321502685547
+  Discriminator iteration: 3/5, loss_fake: -63.17252731323242, loss_real: 57.973934173583984
+  Discriminator iteration: 4/5, loss_fake: -64.82501220703125, loss_real: 60.3362922668457
+Generator iteration: 7/10000, g_loss: -66.31085205078125
+g_loss: -66.31085205078125
+  Discriminator iteration: 0/5, loss_fake: -55.23645782470703, loss_real: 62.583656311035156
+  Discriminator iteration: 1/5, loss_fake: -63.64073181152344, loss_real: 63.46711730957031
+  Discriminator iteration: 2/5, loss_fake: -66.98902893066406, loss_real: 64.624755859375
+  Discriminator iteration: 3/5, loss_fake: -68.87472534179688, loss_real: 66.27045440673828
+  Discriminator iteration: 4/5, loss_fake: -70.6295166015625, loss_real: 68.22697448730469
+Generator iteration: 8/10000, g_loss: -72.2314453125
+g_loss: -72.2314453125
+  Discriminator iteration: 0/5, loss_fake: -34.765419006347656, loss_real: 69.54827880859375
+  Discriminator iteration: 1/5, loss_fake: -70.76392364501953, loss_real: 67.98160552978516
+  Discriminator iteration: 2/5, loss_fake: -73.5224609375, loss_real: 67.04969787597656
+  Discriminator iteration: 3/5, loss_fake: -75.1534194946289, loss_real: 69.40489196777344
+  Discriminator iteration: 4/5, loss_fake: -76.70561218261719, loss_real: 72.51887512207031
+Generator iteration: 9/10000, g_loss: -78.17428588867188
+g_loss: -78.17428588867188
+  Discriminator iteration: 0/5, loss_fake: -73.78175354003906, loss_real: 74.86270141601562
+  Discriminator iteration: 1/5, loss_fake: -76.52604675292969, loss_real: 76.60711669921875
+  Discriminator iteration: 2/5, loss_fake: -78.79411315917969, loss_real: 78.04298400878906
+  Discriminator iteration: 3/5, loss_fake: -80.44847106933594, loss_real: 79.48780822753906
+  Discriminator iteration: 4/5, loss_fake: -82.15071105957031, loss_real: 81.16500854492188
+Generator iteration: 10/10000, g_loss: -83.638916015625
+g_loss: -83.638916015625
+  Discriminator iteration: 0/5, loss_fake: -38.09480285644531, loss_real: 82.47486877441406
+  Discriminator iteration: 1/5, loss_fake: -81.87785339355469, loss_real: 81.09074401855469
+  Discriminator iteration: 2/5, loss_fake: -85.07435607910156, loss_real: 80.58906555175781
+  Discriminator iteration: 3/5, loss_fake: -86.64936065673828, loss_real: 82.64676666259766
+  Discriminator iteration: 4/5, loss_fake: -88.24244689941406, loss_real: 85.0550537109375
+Generator iteration: 11/10000, g_loss: -89.67044067382812
+g_loss: -89.67044067382812
+  Discriminator iteration: 0/5, loss_fake: -86.608154296875, loss_real: 87.24795532226562
+  Discriminator iteration: 1/5, loss_fake: -88.66255187988281, loss_real: 88.86566925048828
+  Discriminator iteration: 2/5, loss_fake: -90.6355209350586, loss_real: 90.6039047241211
+  Discriminator iteration: 3/5, loss_fake: -92.30687713623047, loss_real: 91.89549255371094
+  Discriminator iteration: 4/5, loss_fake: -93.8199691772461, loss_real: 93.44268035888672
+Generator iteration: 12/10000, g_loss: -95.24861145019531
+g_loss: -95.24861145019531
+  Discriminator iteration: 0/5, loss_fake: -76.48056030273438, loss_real: 94.81501770019531
+  Discriminator iteration: 1/5, loss_fake: -94.14186096191406, loss_real: 94.9879150390625
+  Discriminator iteration: 2/5, loss_fake: -96.48548889160156, loss_real: 95.73506927490234
+  Discriminator iteration: 3/5, loss_fake: -98.29795837402344, loss_real: 97.17822265625
+  Discriminator iteration: 4/5, loss_fake: -99.90034484863281, loss_real: 98.75564575195312
+Generator iteration: 13/10000, g_loss: -101.35745239257812
+g_loss: -101.35745239257812
+  Discriminator iteration: 0/5, loss_fake: -98.34741973876953, loss_real: 100.28312683105469
+  Discriminator iteration: 1/5, loss_fake: -100.46841430664062, loss_real: 101.80248260498047
+  Discriminator iteration: 2/5, loss_fake: -102.31283569335938, loss_real: 103.02084350585938
+  Discriminator iteration: 3/5, loss_fake: -104.07954406738281, loss_real: 104.4587631225586
+  Discriminator iteration: 4/5, loss_fake: -105.6181869506836, loss_real: 105.77549743652344
+Generator iteration: 14/10000, g_loss: -107.04107666015625
+g_loss: -107.04107666015625
+  Discriminator iteration: 0/5, loss_fake: -92.4979248046875, loss_real: 107.16273498535156
+  Discriminator iteration: 1/5, loss_fake: -106.47270965576172, loss_real: 107.18720245361328
+  Discriminator iteration: 2/5, loss_fake: -108.64445495605469, loss_real: 107.89588928222656
+  Discriminator iteration: 3/5, loss_fake: -110.34850311279297, loss_real: 109.48194885253906
+  Discriminator iteration: 4/5, loss_fake: -111.92881774902344, loss_real: 110.99100494384766
+Generator iteration: 15/10000, g_loss: -113.30256652832031
+g_loss: -113.30256652832031
+  Discriminator iteration: 0/5, loss_fake: -110.70990753173828, loss_real: 112.71435546875
+  Discriminator iteration: 1/5, loss_fake: -112.665283203125, loss_real: 114.06604766845703
+  Discriminator iteration: 2/5, loss_fake: -114.47039794921875, loss_real: 115.34947204589844
+  Discriminator iteration: 3/5, loss_fake: -116.04154205322266, loss_real: 116.81814575195312
+  Discriminator iteration: 4/5, loss_fake: -117.50746154785156, loss_real: 118.02298736572266
+Generator iteration: 16/10000, g_loss: -118.9949951171875
+g_loss: -118.9949951171875
+  Discriminator iteration: 0/5, loss_fake: -103.41165161132812, loss_real: 119.45610046386719
+  Discriminator iteration: 1/5, loss_fake: -118.65377807617188, loss_real: 119.43620300292969
+  Discriminator iteration: 2/5, loss_fake: -120.56531524658203, loss_real: 119.93606567382812
+  Discriminator iteration: 3/5, loss_fake: -122.20143127441406, loss_real: 121.51498413085938
+  Discriminator iteration: 4/5, loss_fake: -123.718994140625, loss_real: 123.15302276611328
+Generator iteration: 17/10000, g_loss: -125.1541976928711
+g_loss: -125.1541976928711
+  Discriminator iteration: 0/5, loss_fake: -122.59971618652344, loss_real: 124.82002258300781
+  Discriminator iteration: 1/5, loss_fake: -124.63140869140625, loss_real: 126.21317291259766
+  Discriminator iteration: 2/5, loss_fake: -126.30188751220703, loss_real: 127.7139892578125
+  Discriminator iteration: 3/5, loss_fake: -127.86859893798828, loss_real: 128.94293212890625
+  Discriminator iteration: 4/5, loss_fake: -129.33712768554688, loss_real: 130.4126434326172
+Generator iteration: 18/10000, g_loss: -130.67208862304688
+g_loss: -130.67208862304688
+  Discriminator iteration: 0/5, loss_fake: -102.47358703613281, loss_real: 131.598876953125
+  Discriminator iteration: 1/5, loss_fake: -130.59622192382812, loss_real: 129.88693237304688
+  Discriminator iteration: 2/5, loss_fake: -132.26382446289062, loss_real: 129.9952850341797
+  Discriminator iteration: 3/5, loss_fake: -133.905517578125, loss_real: 132.41871643066406
+  Discriminator iteration: 4/5, loss_fake: -135.41529846191406, loss_real: 134.73117065429688
+Generator iteration: 19/10000, g_loss: -136.82676696777344
+g_loss: -136.82676696777344
+  Discriminator iteration: 0/5, loss_fake: -135.05715942382812, loss_real: 136.60569763183594
+  Discriminator iteration: 1/5, loss_fake: -136.66897583007812, loss_real: 138.1801300048828
+  Discriminator iteration: 2/5, loss_fake: -138.33651733398438, loss_real: 139.58090209960938
+  Discriminator iteration: 3/5, loss_fake: -139.6519317626953, loss_real: 141.08761596679688
+  Discriminator iteration: 4/5, loss_fake: -141.04428100585938, loss_real: 142.48428344726562
+Generator iteration: 20/10000, g_loss: -142.51034545898438
+g_loss: -142.51034545898438
+  Discriminator iteration: 0/5, loss_fake: -130.19143676757812, loss_real: 143.88914489746094
+  Discriminator iteration: 1/5, loss_fake: -141.18435668945312, loss_real: 144.09921264648438
+  Discriminator iteration: 2/5, loss_fake: -143.70606994628906, loss_real: 144.8732452392578
+  Discriminator iteration: 3/5, loss_fake: -145.64247131347656, loss_real: 146.33909606933594
+  Discriminator iteration: 4/5, loss_fake: -147.18463134765625, loss_real: 147.93772888183594
+Generator iteration: 21/10000, g_loss: -148.5301513671875
+g_loss: -148.5301513671875
+  Discriminator iteration: 0/5, loss_fake: -141.66665649414062, loss_real: 149.32443237304688
+  Discriminator iteration: 1/5, loss_fake: -147.68759155273438, loss_real: 150.40618896484375
+  Discriminator iteration: 2/5, loss_fake: -149.5791015625, loss_real: 151.4882354736328
+  Discriminator iteration: 3/5, loss_fake: -151.24984741210938, loss_real: 152.93511962890625
+  Discriminator iteration: 4/5, loss_fake: -152.90322875976562, loss_real: 154.33517456054688
+Generator iteration: 22/10000, g_loss: -154.31504821777344
+g_loss: -154.31504821777344
+  Discriminator iteration: 0/5, loss_fake: -131.14065551757812, loss_real: 155.6864471435547
+  Discriminator iteration: 1/5, loss_fake: -153.1050262451172, loss_real: 151.70654296875
+  Discriminator iteration: 2/5, loss_fake: -154.6072540283203, loss_real: 153.58804321289062
+  Discriminator iteration: 3/5, loss_fake: -157.04444885253906, loss_real: 156.6013641357422
+  Discriminator iteration: 4/5, loss_fake: -159.04212951660156, loss_real: 158.72299194335938
+Generator iteration: 23/10000, g_loss: -160.48114013671875
+g_loss: -160.48114013671875
+  Discriminator iteration: 0/5, loss_fake: -159.17901611328125, loss_real: 160.84420776367188
+  Discriminator iteration: 1/5, loss_fake: -160.7772216796875, loss_real: 162.45152282714844
+  Discriminator iteration: 2/5, loss_fake: -162.45294189453125, loss_real: 164.0379638671875
+  Discriminator iteration: 3/5, loss_fake: -163.80198669433594, loss_real: 165.29898071289062
+  Discriminator iteration: 4/5, loss_fake: -165.15264892578125, loss_real: 166.78076171875
+Generator iteration: 24/10000, g_loss: -166.44338989257812
+g_loss: -166.44338989257812
+  Discriminator iteration: 0/5, loss_fake: -162.72218322753906, loss_real: 168.18112182617188
+  Discriminator iteration: 1/5, loss_fake: -165.84210205078125, loss_real: 169.26620483398438
+  Discriminator iteration: 2/5, loss_fake: -167.7531280517578, loss_real: 170.47555541992188
+  Discriminator iteration: 3/5, loss_fake: -169.34938049316406, loss_real: 171.74295043945312
+  Discriminator iteration: 4/5, loss_fake: -170.93695068359375, loss_real: 172.94183349609375
+Generator iteration: 25/10000, g_loss: -172.3572540283203
+g_loss: -172.3572540283203
+  Discriminator iteration: 0/5, loss_fake: -165.25405883789062, loss_real: 174.20816040039062
+  Discriminator iteration: 1/5, loss_fake: -171.4625701904297, loss_real: 175.0422821044922
+  Discriminator iteration: 2/5, loss_fake: -173.7706298828125, loss_real: 176.04446411132812
+  Discriminator iteration: 3/5, loss_fake: -175.54989624023438, loss_real: 177.17230224609375
+  Discriminator iteration: 4/5, loss_fake: -177.092529296875, loss_real: 178.6483154296875
+Generator iteration: 26/10000, g_loss: -178.36106872558594
+g_loss: -178.36106872558594
+  Discriminator iteration: 0/5, loss_fake: -172.15469360351562, loss_real: 180.10047912597656
+  Discriminator iteration: 1/5, loss_fake: -178.15780639648438, loss_real: 180.95181274414062
+  Discriminator iteration: 2/5, loss_fake: -179.6471710205078, loss_real: 182.05731201171875
+  Discriminator iteration: 3/5, loss_fake: -181.4484100341797, loss_real: 183.43893432617188
+  Discriminator iteration: 4/5, loss_fake: -183.11212158203125, loss_real: 184.86407470703125
+Generator iteration: 27/10000, g_loss: -184.3964080810547
+g_loss: -184.3964080810547
+  Discriminator iteration: 0/5, loss_fake: -178.28848266601562, loss_real: 186.19256591796875
+  Discriminator iteration: 1/5, loss_fake: -184.24502563476562, loss_real: 187.01026916503906
+  Discriminator iteration: 2/5, loss_fake: -185.78797912597656, loss_real: 187.95071411132812
+  Discriminator iteration: 3/5, loss_fake: -187.55606079101562, loss_real: 189.46893310546875
+  Discriminator iteration: 4/5, loss_fake: -189.09390258789062, loss_real: 191.0037078857422
+Generator iteration: 28/10000, g_loss: -190.42918395996094
+g_loss: -190.42918395996094
+  Discriminator iteration: 0/5, loss_fake: -184.1929931640625, loss_real: 192.3961181640625
+  Discriminator iteration: 1/5, loss_fake: -190.3455810546875, loss_real: 193.16256713867188
+  Discriminator iteration: 2/5, loss_fake: -191.85914611816406, loss_real: 194.37982177734375
+  Discriminator iteration: 3/5, loss_fake: -193.5479736328125, loss_real: 195.73733520507812
+  Discriminator iteration: 4/5, loss_fake: -195.25531005859375, loss_real: 197.1634521484375
+Generator iteration: 29/10000, g_loss: -196.57713317871094
+g_loss: -196.57713317871094
+  Discriminator iteration: 0/5, loss_fake: -191.79592895507812, loss_real: 198.4931182861328
+  Discriminator iteration: 1/5, loss_fake: -196.4943084716797, loss_real: 199.5548095703125
+  Discriminator iteration: 2/5, loss_fake: -198.11793518066406, loss_real: 200.55345153808594
+  Discriminator iteration: 3/5, loss_fake: -199.63455200195312, loss_real: 202.01742553710938
+  Discriminator iteration: 4/5, loss_fake: -201.3555908203125, loss_real: 203.39666748046875
+Generator iteration: 30/10000, g_loss: -202.68360900878906
+g_loss: -202.68360900878906
+  Discriminator iteration: 0/5, loss_fake: -195.7227783203125, loss_real: 204.80581665039062
+  Discriminator iteration: 1/5, loss_fake: -202.5518798828125, loss_real: 205.0426483154297
+  Discriminator iteration: 2/5, loss_fake: -203.8937530517578, loss_real: 206.38986206054688
+  Discriminator iteration: 3/5, loss_fake: -206.00747680664062, loss_real: 207.91268920898438
+  Discriminator iteration: 4/5, loss_fake: -207.5180206298828, loss_real: 209.51290893554688
+Generator iteration: 31/10000, g_loss: -208.79074096679688
+g_loss: -208.79074096679688
+  Discriminator iteration: 0/5, loss_fake: -202.57861328125, loss_real: 210.97128295898438
+  Discriminator iteration: 1/5, loss_fake: -208.99786376953125, loss_real: 211.42214965820312
+  Discriminator iteration: 2/5, loss_fake: -210.11984252929688, loss_real: 213.0586395263672
+  Discriminator iteration: 3/5, loss_fake: -212.0789337158203, loss_real: 214.3604736328125
+  Discriminator iteration: 4/5, loss_fake: -213.6318359375, loss_real: 215.7349090576172
+Generator iteration: 32/10000, g_loss: -214.9479522705078
+g_loss: -214.9479522705078
+  Discriminator iteration: 0/5, loss_fake: -211.06808471679688, loss_real: 217.09716796875
+  Discriminator iteration: 1/5, loss_fake: -215.3962860107422, loss_real: 218.17726135253906
+  Discriminator iteration: 2/5, loss_fake: -216.66265869140625, loss_real: 219.41761779785156
+  Discriminator iteration: 3/5, loss_fake: -218.18502807617188, loss_real: 220.78591918945312
+  Discriminator iteration: 4/5, loss_fake: -219.72369384765625, loss_real: 222.1258087158203
+Generator iteration: 33/10000, g_loss: -221.03530883789062
+g_loss: -221.03530883789062
+  Discriminator iteration: 0/5, loss_fake: -216.90196228027344, loss_real: 223.5098876953125
+  Discriminator iteration: 1/5, loss_fake: -221.48663330078125, loss_real: 224.47093200683594
+  Discriminator iteration: 2/5, loss_fake: -222.49014282226562, loss_real: 225.70401000976562
+  Discriminator iteration: 3/5, loss_fake: -224.3727264404297, loss_real: 227.11282348632812
+  Discriminator iteration: 4/5, loss_fake: -225.8505096435547, loss_real: 228.31753540039062
+Generator iteration: 34/10000, g_loss: -227.10174560546875
+g_loss: -227.10174560546875
+  Discriminator iteration: 0/5, loss_fake: -223.44363403320312, loss_real: 229.67724609375
+  Discriminator iteration: 1/5, loss_fake: -227.6090087890625, loss_real: 230.64938354492188
+  Discriminator iteration: 2/5, loss_fake: -228.78921508789062, loss_real: 231.93051147460938
+  Discriminator iteration: 3/5, loss_fake: -230.40682983398438, loss_real: 233.224853515625
+  Discriminator iteration: 4/5, loss_fake: -231.8818359375, loss_real: 234.51478576660156
+Generator iteration: 35/10000, g_loss: -233.22311401367188
+g_loss: -233.22311401367188
+  Discriminator iteration: 0/5, loss_fake: -229.84317016601562, loss_real: 235.81671142578125
+  Discriminator iteration: 1/5, loss_fake: -233.55819702148438, loss_real: 236.7869110107422
+  Discriminator iteration: 2/5, loss_fake: -234.8254852294922, loss_real: 238.07589721679688
+  Discriminator iteration: 3/5, loss_fake: -236.4624786376953, loss_real: 239.32571411132812
+  Discriminator iteration: 4/5, loss_fake: -237.87796020507812, loss_real: 240.67385864257812
+Generator iteration: 36/10000, g_loss: -239.20263671875
+g_loss: -239.20263671875
+  Discriminator iteration: 0/5, loss_fake: -234.9685821533203, loss_real: 241.96292114257812
+  Discriminator iteration: 1/5, loss_fake: -239.52471923828125, loss_real: 242.890625
+  Discriminator iteration: 2/5, loss_fake: -240.57691955566406, loss_real: 244.11856079101562
+  Discriminator iteration: 3/5, loss_fake: -242.50396728515625, loss_real: 245.43869018554688
+  Discriminator iteration: 4/5, loss_fake: -243.9685821533203, loss_real: 246.744873046875
+Generator iteration: 37/10000, g_loss: -245.27197265625
+g_loss: -245.27197265625
+  Discriminator iteration: 0/5, loss_fake: -240.73399353027344, loss_real: 247.99835205078125
+  Discriminator iteration: 1/5, loss_fake: -245.4730224609375, loss_real: 248.69598388671875
+  Discriminator iteration: 2/5, loss_fake: -246.65908813476562, loss_real: 250.0406494140625

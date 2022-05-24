@@ -1,0 +1,66 @@
+2022-05-23 01:02:01.672465: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudart.so.11.0
+2022-05-23 01:02:09.477650: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcuda.so.1
+2022-05-23 01:02:09.478302: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 0 with properties: 
+pciBusID: 0000:5e:00.0 name: NVIDIA GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2022-05-23 01:02:09.478848: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 1 with properties: 
+pciBusID: 0000:b1:00.0 name: NVIDIA GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2022-05-23 01:02:09.479344: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 2 with properties: 
+pciBusID: 0000:d9:00.0 name: NVIDIA GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2022-05-23 01:02:09.479367: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudart.so.11.0
+2022-05-23 01:02:09.482907: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublas.so.11
+2022-05-23 01:02:09.482953: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublasLt.so.11
+2022-05-23 01:02:09.484366: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcufft.so.10
+2022-05-23 01:02:09.484622: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcurand.so.10
+2022-05-23 01:02:09.485059: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcusolver.so.11
+2022-05-23 01:02:09.485732: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcusparse.so.11
+2022-05-23 01:02:09.485859: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudnn.so.8
+2022-05-23 01:02:09.488734: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1871] Adding visible gpu devices: 0, 1, 2
+2022-05-23 01:02:09.489095: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2022-05-23 01:02:09.644893: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 0 with properties: 
+pciBusID: 0000:5e:00.0 name: NVIDIA GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2022-05-23 01:02:09.645430: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 1 with properties: 
+pciBusID: 0000:b1:00.0 name: NVIDIA GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2022-05-23 01:02:09.645909: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 2 with properties: 
+pciBusID: 0000:d9:00.0 name: NVIDIA GeForce RTX 2080 Ti computeCapability: 7.5
+coreClock: 1.545GHz coreCount: 68 deviceMemorySize: 10.76GiB deviceMemoryBandwidth: 573.69GiB/s
+2022-05-23 01:02:09.648720: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1871] Adding visible gpu devices: 0, 1, 2
+2022-05-23 01:02:09.648775: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudart.so.11.0
+2022-05-23 01:02:10.895062: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1258] Device interconnect StreamExecutor with strength 1 edge matrix:
+2022-05-23 01:02:10.895094: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1264]      0 1 2 
+2022-05-23 01:02:10.895110: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1277] 0:   N N N 
+2022-05-23 01:02:10.895113: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1277] 1:   N N N 
+2022-05-23 01:02:10.895116: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1277] 2:   N N N 
+2022-05-23 01:02:10.898679: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1418] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 8607 MB memory) -> physical GPU (device: 0, name: NVIDIA GeForce RTX 2080 Ti, pci bus id: 0000:5e:00.0, compute capability: 7.5)
+2022-05-23 01:02:10.899679: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1418] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:1 with 9659 MB memory) -> physical GPU (device: 1, name: NVIDIA GeForce RTX 2080 Ti, pci bus id: 0000:b1:00.0, compute capability: 7.5)
+2022-05-23 01:02:10.900627: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1418] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:2 with 9659 MB memory) -> physical GPU (device: 2, name: NVIDIA GeForce RTX 2080 Ti, pci bus id: 0000:d9:00.0, compute capability: 7.5)
+2022-05-23 01:02:15.553518: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 8.41G (9025552384 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.554743: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 7.56G (8122996736 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.555917: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 6.81G (7310696960 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.557086: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 6.13G (6579627008 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.558249: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 5.51G (5921664000 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.559213: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 4.96G (5329497600 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.559801: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 4.47G (4796547584 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.560388: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 4.02G (4316892672 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.560979: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 3.62G (3885203200 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.561607: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 3.26G (3496682752 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.562193: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 2.93G (3147014400 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.562837: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 2.64G (2832312832 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.563513: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 2.37G (2549081600 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.564104: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 2.14G (2294173440 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+2022-05-23 01:02:15.564737: I tensorflow/stream_executor/cuda/cuda_driver.cc:789] failed to allocate 1.92G (2064756224 bytes) from device: CUDA_ERROR_OUT_OF_MEMORY: out of memory
+Traceback (most recent call last):
+  File "main_savemrc_128.py", line 42, in <module>
+    main(args)
+  File "main_savemrc_128.py", line 30, in main
+    model.train(train_loader)
+  File "/cdata/NT2C/noise_synthesizer/pytorch-wgan-master/models/wgan_gradient_penalty_savemrc_128.py", line 230, in train
+    gradient_penalty = self.calculate_gradient_penalty(images.data, fake_images.data)
+  File "/cdata/NT2C/noise_synthesizer/pytorch-wgan-master/models/wgan_gradient_penalty_savemrc_128.py", line 389, in calculate_gradient_penalty
+    eta = eta.cuda(self.cuda_index)
+KeyboardInterrupt
