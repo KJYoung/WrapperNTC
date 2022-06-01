@@ -1,3 +1,0 @@
-True
-WGAN_GradientPenalty init model.
-True

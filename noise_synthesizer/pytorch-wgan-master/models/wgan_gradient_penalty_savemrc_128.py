@@ -288,38 +288,31 @@ class WGAN_GP(object):
                 utils.save_image(grid, 'training_result_images/img_generatori_iter_{}.png'.format(str(g_iter).zfill(3)))
                 #add by lihongjia 
 
-                noise_out_0=mrcfile.new('training_result_images/img_generatori_iter_{}_0.mrc'.format(str(g_iter)),overwrite=True)
-                noise_out_1=mrcfile.new('training_result_images/img_generatori_iter_{}_1.mrc'.format(str(g_iter)),overwrite=True)
-                noise_out_2=mrcfile.new('training_result_images/img_generatori_iter_{}_2.mrc'.format(str(g_iter)),overwrite=True)
-                noise_out_3=mrcfile.new('training_result_images/img_generatori_iter_{}_3.mrc'.format(str(g_iter)),overwrite=True)
-                noise_out_4=mrcfile.new('training_result_images/img_generatori_iter_{}_4.mrc'.format(str(g_iter)),overwrite=True)                
-                noise_arr_0=samples.data.cpu().numpy()[0]
-                #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                #print(noise_arr_0.shape[0],noise_arr_0.shape[1])
-                #print(noise_arr_0)
-                noise_arr_1=samples.data.cpu().numpy()[1]
-                noise_arr_2=samples.data.cpu().numpy()[2]
-                noise_arr_3=samples.data.cpu().numpy()[3]
-                noise_arr_4=samples.data.cpu().numpy()[4]
-                noise_out_0.set_data(noise_arr_0)
-                noise_out_1.set_data(noise_arr_1)
-                noise_out_2.set_data(noise_arr_2)
-                noise_out_3.set_data(noise_arr_3)
-                noise_out_4.set_data(noise_arr_4)
+                # noise_out_0=mrcfile.new('training_result_images/img_generatori_iter_{}_0.mrc'.format(str(g_iter)),overwrite=True)
+                # noise_out_1=mrcfile.new('training_result_images/img_generatori_iter_{}_1.mrc'.format(str(g_iter)),overwrite=True)
+                # noise_out_2=mrcfile.new('training_result_images/img_generatori_iter_{}_2.mrc'.format(str(g_iter)),overwrite=True)
+                # noise_out_3=mrcfile.new('training_result_images/img_generatori_iter_{}_3.mrc'.format(str(g_iter)),overwrite=True)
+                # noise_out_4=mrcfile.new('training_result_images/img_generatori_iter_{}_4.mrc'.format(str(g_iter)),overwrite=True)                
+                # noise_arr_0=samples.data.cpu().numpy()[0]
+                # noise_arr_1=samples.data.cpu().numpy()[1]
+                # noise_arr_2=samples.data.cpu().numpy()[2]
+                # noise_arr_3=samples.data.cpu().numpy()[3]
+                # noise_arr_4=samples.data.cpu().numpy()[4]
+                # noise_out_0.set_data(noise_arr_0)
+                # noise_out_1.set_data(noise_arr_1)
+                # noise_out_2.set_data(noise_arr_2)
+                # noise_out_3.set_data(noise_arr_3)
+                # noise_out_4.set_data(noise_arr_4)
                 # Testing
                 time = t.time() - self.t_begin
-                #print("Real Inception score: {}".format(inception_score))
                 print("Generator iter: {}".format(g_iter))
                 print("Time {}".format(time))
-
                 # Write to file inception_score, gen_iters, time
                 #output = str(g_iter) + " " + str(time) + " " + str(inception_score[0]) + "\n"
                 #self.file.write(output)
 
-
                 # ============ TensorBoard logging ============#
                 # (1) Log the scalar values
-                
                 print("Wasserstein distance: {} |Loss D: {} |Loss G:{} |Loss D Real:{} |Loss D Fake:{}".format(Wasserstein_D,d_loss,g_cost,d_loss_real,d_loss_fake))
                 '''
                 info = {
@@ -330,20 +323,14 @@ class WGAN_GP(object):
                     'Loss D Fake': d_loss_fake.data
 
                 }
-                
                 '''
-                
-                
                 info = {
                     'Wasserstein distance': Wasserstein_D,
                     'Loss D': d_loss,
                     'Loss G': g_cost,
                     'Loss D Real': d_loss_real,
                     'Loss D Fake': d_loss_fake
-
                 }
-                
-            
 
                 for tag, value in info.items():
                     print(value)
@@ -362,12 +349,9 @@ class WGAN_GP(object):
                 for tag, images in info.items():
                     self.logger.image_summary(tag, images, g_iter + 1)
 
-
-
         self.t_end = t.time()
         print('Time of training-{}'.format((self.t_end - self.t_begin)))
         #self.file.close()
-
         # Save the trained parameters
         self.save_model()
 
@@ -395,7 +379,7 @@ class WGAN_GP(object):
         samplesNP = samples.numpy()
         for sampleNum in range(self.batch_size):
             noiseID = startNum + sampleNum
-            noise_out=mrcfile.new('synthesized_noises/synthesized_noise_{}.mrc'.format(str(noiseID)), overwrite=True)
+            noise_out=mrcfile.new('synthesized_noises/synthesized_noise_{}.mrc'.format(str(noiseID)), overwrite=False)
             noise_out.set_data(samplesNP[sampleNum])
         grid = utils.make_grid(samples)
         gridName = 'synthesized_grid/overview_synthesized_{}-{}.png'.format(str(startNum), str(startNum+self.batch_size-1))

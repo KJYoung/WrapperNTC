@@ -9,10 +9,6 @@ import random
 
 from functools import reduce
 
-
-
-
-
 def func(p,x,y,noise_mean):
     k1,k2,b=p
     return k1*x+k2*(y-noise_mean)+b
@@ -20,8 +16,6 @@ def func(p,x,y,noise_mean):
 def error(p,x,y,noise_mean,z):
     #print(s)
     return func(p,x,y,noise_mean)-z 
-
-
 
 def fit_noise(clean,noise,noisy):
     #print(noise.shape)
@@ -31,17 +25,13 @@ def fit_noise(clean,noise,noisy):
     Zi=np.array([i for j in noisy for i in j],dtype=np.float64)
     noise_mean=np.mean(Yi)
     p0=[100,100,2]
-    #print(Xi.shape)
-    #print(Yi.shape)
-    #print(Zi.shape)
-    #print(noise_mean.shape)
+    
+    # (4096, 4096) (128, 128) (4096, 4096) ()
+    print(Xi.shape, Yi.shape, Zi.shape, noise_mean.shape)
     Para=leastsq(error,p0,args=(Xi,Yi,noise_mean,Zi))
     k1,k2,b=Para[0]
 
     return k1,k2,b
-
-
-
     
 clean_dir=sys.argv[1]
 noise_dir=sys.argv[2]

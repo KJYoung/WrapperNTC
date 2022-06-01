@@ -188,6 +188,7 @@ class WGAN_GP(object):
             one = one.cuda(self.cuda_index)
             mone = mone.cuda(self.cuda_index)
 
+        # print(self.generator_iters , " // " , self.critic_iter)
         for g_iter in range(self.generator_iters):
             # Requires grad, Generator requires_grad = False
             for p in self.D.parameters():
@@ -316,40 +317,26 @@ class WGAN_GP(object):
                 # (1) Log the scalar values
                 
                 
-                info = {
-                    'Wasserstein distance': Wasserstein_D.data,
-                    'Loss D': d_loss.data,
-                    'Loss G': g_cost.data,
-                    'Loss D Real': d_loss_real.data,
-                    'Loss D Fake': d_loss_fake.data
+                # info = {
+                #     'Wasserstein distance': Wasserstein_D,
+                #     'Loss D': d_loss,
+                #     'Loss G': g_cost,
+                #     'Loss D Real': d_loss_real,
+                #     'Loss D Fake': d_loss_fake
+                # }
 
-                }
-                '''
-                info = {
-                    'Wasserstein distance': Wasserstein_D,
-                    'Loss D': d_loss,
-                    'Loss G': g_cost,
-                    'Loss D Real': d_loss_real.data,
-                    'Loss D Fake': d_loss_fake.data
+                # for tag, value in info.items():
+                #     print(value)
+                #     self.logger.scalar_summary(tag, value.data.cpu().numpy(), g_iter + 1)
 
-                }
-                '''
+                # # (3) Log the images
+                # info = {
+                #     'real_images': self.real_images(images, self.number_of_images),
+                #     'generated_images': self.generate_img(z, self.number_of_images)
+                # }
 
-                for tag, value in info.items():
-                    print(value)
-                    print(value.cpu())
-                    print(value.cpu().numpy())
-                    #self.logger.scalar_summary(tag, value.cpu(), g_iter + 1)
-                    self.logger.scalar_summary(tag, value.cpu().numpy(), g_iter + 1)
-
-                # (3) Log the images
-                info = {
-                    'real_images': self.real_images(images, self.number_of_images),
-                    'generated_images': self.generate_img(z, self.number_of_images)
-                }
-
-                for tag, images in info.items():
-                    self.logger.image_summary(tag, images, g_iter + 1)
+                # for tag, images in info.items():
+                #     self.logger.image_summary(tag, images, g_iter + 1)
 
 
 

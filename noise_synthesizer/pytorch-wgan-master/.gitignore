@@ -8,3 +8,4 @@ inception_score_graph.txt
 .vscode/
 *.mrc
 synthesized_noises
+legacy_training
