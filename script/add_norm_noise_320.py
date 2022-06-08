@@ -27,7 +27,11 @@ def fit_noise(clean,noise,noisy):
     p0=[100,100,2]
     
     # (4096, 4096) (128, 128) (4096, 4096) ()
+    Xi = Xi.flatten()
+    Yi = Yi.flatten()
+    Zi = Zi.flatten()
     print(Xi.shape, Yi.shape, Zi.shape, noise_mean.shape)
+    print(Xi.dtype, Yi.dtype, Zi.dtype, noise_mean.dtype)
     Para=leastsq(error,p0,args=(Xi,Yi,noise_mean,Zi))
     k1,k2,b=Para[0]
 
@@ -58,16 +62,20 @@ for clean_img in clean_list:
     clean=clean.data
     noisy=noisy.data
     noise=noise.data
+    print(" Before fit : ", clean.shape, noisy.shape, noise.shape)
     clean=(clean-np.min(clean))/(np.max(clean)-np.min(clean))*255.0
     noisy=(noisy-np.min(noisy))/(np.max(noisy)-np.min(noisy))*255.0
     noise=(noise-np.min(noise))/(np.max(noise)-np.min(noise))*255.0
     k1,k2,b=fit_noise(clean,noise,noisy)
     print('k1,k2,b: {}, {}, {}'.format(k1,k2,b))
+    print(" After fit : ", clean.shape, noisy.shape, noise.shape)
     noisy_gen=k1*clean+k2*(noise-np.mean(noise))+b+(noise-np.mean(noise))
     #noisy_gen = noisy_gen.reshape((640,640))
-    noisy_gen = noisy_gen.reshape((320,320))
+    #noisy_gen = noisy_gen.reshape((320,320))
+    noisy_gen = noisy_gen.reshape((128,128))
     fit_noisy_out=mrcfile.new(noisy_gen_dir+clean_img,overwrite=True)
     fit_noisy_out.set_data(noisy_gen.astype(np.float32))
 
-
+# This file add_norm_noise_128 for now.
+# python3 add_norm_noise_320.py /cdata/temp/clean/ /cdata/NT2C/noise_synthesizer/pytorch-wgan-master/synthesized_noises/ /cdata/temp/noisy/  /cdata/temp/reweighted/
 

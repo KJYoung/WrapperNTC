@@ -254,7 +254,6 @@ class WGAN_GP(object):
             self.g_optimizer.step()
             
             print(f'Generator iteration: {g_iter}/{self.generator_iters}, g_loss: {g_loss}')
-            print("g_loss: {}".format(g_loss))
             
             # Saving model and sampling images every 1000th generator iterations
             if (g_iter) % SAVE_PER_TIMES == 0:
