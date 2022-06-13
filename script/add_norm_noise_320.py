@@ -18,8 +18,8 @@ def error(p,x,y,noise_mean,z):
     return func(p,x,y,noise_mean)-z 
 
 def fit_noise(clean,noise,noisy):
-    #print(noise.shape)
-    #noise=noise[0,:,:]
+    # print(noise.shape)
+    # noise=noise[0,:,:]
     Xi=np.array([i for j in clean for i in j],dtype=np.float64)
     Yi=np.array([i for j in noise for i in j],dtype=np.float64)
     Zi=np.array([i for j in noisy for i in j],dtype=np.float64)
@@ -30,8 +30,9 @@ def fit_noise(clean,noise,noisy):
     Xi = Xi.flatten()
     Yi = Yi.flatten()
     Zi = Zi.flatten()
-    print(Xi.shape, Yi.shape, Zi.shape, noise_mean.shape)
-    print(Xi.dtype, Yi.dtype, Zi.dtype, noise_mean.dtype)
+    # print(Xi.shape, Yi.shape, Zi.shape, noise_mean.shape)
+    # (16384,) (16384,) (16384,) ()
+    # print(Xi.dtype, Yi.dtype, Zi.dtype, noise_mean.dtype)
     Para=leastsq(error,p0,args=(Xi,Yi,noise_mean,Zi))
     k1,k2,b=Para[0]
 
@@ -49,6 +50,7 @@ noise_len=len(noise_list)
 
 for clean_img in clean_list:
     rand1=random.randint(0,noise_len-1)
+    rand1=0 # Fix for merge. ##################################################
     #clean_path=clean_dir+clean_img
     #noisy_path=noisy_dir+clean_img
     #noise_path=noise_dir+noise_list[rand1]
@@ -62,17 +64,17 @@ for clean_img in clean_list:
     clean=clean.data
     noisy=noisy.data
     noise=noise.data
-    print(" Before fit : ", clean.shape, noisy.shape, noise.shape)
     clean=(clean-np.min(clean))/(np.max(clean)-np.min(clean))*255.0
     noisy=(noisy-np.min(noisy))/(np.max(noisy)-np.min(noisy))*255.0
     noise=(noise-np.min(noise))/(np.max(noise)-np.min(noise))*255.0
     k1,k2,b=fit_noise(clean,noise,noisy)
     print('k1,k2,b: {}, {}, {}'.format(k1,k2,b))
-    print(" After fit : ", clean.shape, noisy.shape, noise.shape)
     noisy_gen=k1*clean+k2*(noise-np.mean(noise))+b+(noise-np.mean(noise))
     #noisy_gen = noisy_gen.reshape((640,640))
     #noisy_gen = noisy_gen.reshape((320,320))
-    noisy_gen = noisy_gen.reshape((128,128))
+    # (1, 128, 128) -> (128, 128)
+    noisy_gen = noisy_gen.reshape((noisy_gen.shape[1],noisy_gen.shape[2]))
+    # print("noisy_gen : ", noisy_gen.shape)
     fit_noisy_out=mrcfile.new(noisy_gen_dir+clean_img,overwrite=True)
     fit_noisy_out.set_data(noisy_gen.astype(np.float32))
 
