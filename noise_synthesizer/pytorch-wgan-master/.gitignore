@@ -9,3 +9,4 @@ inception_score_graph.txt
 *.mrc
 synthesized_noises
 legacy_training
+temp.txt

@@ -50,8 +50,6 @@ def get_data_loader(args):
         ])
         train_dataset=CustomDataset(root=args.dataroot, train=True, transform=trans)
         test_dataset = CustomDataset(root=args.dataroot, train=False, transform=trans)
-        #train_dataset = FashionMNIST(root=args.dataroot, train=True, download=args.download, transform=trans)
-        #test_dataset = FashionMNIST(root=args.dataroot, train=False, download=args.download, transform=trans)
     # Check if everything is ok with loading datasets
     assert train_dataset
     assert test_dataset
