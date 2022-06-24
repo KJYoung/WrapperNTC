@@ -1,5 +1,5 @@
 from utils.config import parse_args
-from models.wgan_gradient_penalty_savemrc_128 import WGAN_GP
+from models.wgan_gradient_penalty_savemrc_320 import WGAN_GP
 
 def main(args):
     model =  WGAN_GP(args)
@@ -11,4 +11,4 @@ if __name__ == '__main__':
     print("ARGS CUDA : ", args.cuda)
     main(args)
 
-# python3 main_generateV_128.py --dataset custom --batch_size 64 --dataroot /cdata/NT2C/denoiser/noiseExtract/np --cuda True --load_D ./discriminator.pkl --load_G ./generator.pkl
+# CUDA_VISIBLE_DEVICES=5 python main_generateV_256.py --dataset custom --batch_size 64 --dataroot / --cuda True --load_D /cdata/db1/logs/discriminator.pkl --load_G /cdata/db1/logs/generator.pkl
