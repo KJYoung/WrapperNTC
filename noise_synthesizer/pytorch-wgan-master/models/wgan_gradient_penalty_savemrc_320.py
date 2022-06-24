@@ -233,7 +233,6 @@ class WGAN_GP(object):
                 #edit by lihongjia 
                 gradient_penalty.backward(retain_graph=True)
 
-
                 d_loss = d_loss_fake - d_loss_real + gradient_penalty
                 Wasserstein_D = d_loss_real - d_loss_fake
                 self.d_optimizer.step()

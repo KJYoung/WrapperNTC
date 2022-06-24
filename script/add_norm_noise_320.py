@@ -49,35 +49,38 @@ noisy_list=os.listdir(noisy_dir)
 noise_len=len(noise_list)
 
 for clean_img in clean_list:
-    rand1=random.randint(0,noise_len-1)
-    rand1=0 # Fix for merge. ##################################################
-    #clean_path=clean_dir+clean_img
-    #noisy_path=noisy_dir+clean_img
-    #noise_path=noise_dir+noise_list[rand1]
-    clean_path=os.path.join(clean_dir,clean_img)
-    noisy_path=os.path.join(noisy_dir,clean_img)
-    noise_path=os.path.join(noise_dir,noise_list[rand1])
+    for reIndex in range(3): # 64000 * 3 = 192000
+        #assert False
+        rand1=random.randint(0,noise_len-1)
+        print(noisy_gen_dir+clean_img[:-4]+"_{}".format(reIndex)+".mrc" + " | with noise {}".format(rand1))
+        # rand1=0 # Fix for merge. ##################################################
+        #clean_path=clean_dir+clean_img
+        #noisy_path=noisy_dir+clean_img
+        #noise_path=noise_dir+noise_list[rand1]
+        clean_path=os.path.join(clean_dir,clean_img)
+        noisy_path=os.path.join(noisy_dir,clean_img)
+        noise_path=os.path.join(noise_dir,noise_list[rand1])
 
-    clean=mrcfile.open(clean_path)
-    noisy=mrcfile.open(noisy_path)
-    noise=mrcfile.open(noise_path)
-    clean=clean.data
-    noisy=noisy.data
-    noise=noise.data
-    clean=(clean-np.min(clean))/(np.max(clean)-np.min(clean))*255.0
-    noisy=(noisy-np.min(noisy))/(np.max(noisy)-np.min(noisy))*255.0
-    noise=(noise-np.min(noise))/(np.max(noise)-np.min(noise))*255.0
-    k1,k2,b=fit_noise(clean,noise,noisy)
-    print('k1,k2,b: {}, {}, {}'.format(k1,k2,b))
-    noisy_gen=k1*clean+k2*(noise-np.mean(noise))+b+(noise-np.mean(noise))
-    #noisy_gen = noisy_gen.reshape((640,640))
-    #noisy_gen = noisy_gen.reshape((320,320))
-    # (1, 128, 128) -> (128, 128)
-    noisy_gen = noisy_gen.reshape((noisy_gen.shape[1],noisy_gen.shape[2]))
-    # print("noisy_gen : ", noisy_gen.shape)
-    fit_noisy_out=mrcfile.new(noisy_gen_dir+clean_img,overwrite=True)
-    fit_noisy_out.set_data(noisy_gen.astype(np.float32))
+        clean=mrcfile.open(clean_path)
+        noisy=mrcfile.open(noisy_path)
+        noise=mrcfile.open(noise_path)
+        clean=clean.data
+        noisy=noisy.data
+        noise=noise.data
+        clean=(clean-np.min(clean))/(np.max(clean)-np.min(clean))*255.0
+        noisy=(noisy-np.min(noisy))/(np.max(noisy)-np.min(noisy))*255.0
+        noise=(noise-np.min(noise))/(np.max(noise)-np.min(noise))*255.0
+        k1,k2,b=fit_noise(clean,noise,noisy)
+        # print('k1,k2,b: {}, {}, {}'.format(k1,k2,b))
+        noisy_gen=k1*clean+k2*(noise-np.mean(noise))+b+(noise-np.mean(noise))
+        #noisy_gen = noisy_gen.reshape((640,640))
+        #noisy_gen = noisy_gen.reshape((320,320))
+        # (1, 128, 128) -> (128, 128)
+        noisy_gen = noisy_gen.reshape((noisy_gen.shape[1],noisy_gen.shape[2]))
+        # print("noisy_gen : ", noisy_gen.shape)
+        fit_noisy_out=mrcfile.new(noisy_gen_dir+clean_img[:-4]+"_{}".format(reIndex)+".mrc",overwrite=True)
+        fit_noisy_out.set_data(noisy_gen.astype(np.float32))
 
 # This file add_norm_noise_128 for now.
 # python3 add_norm_noise_320.py /cdata/temp/clean/ /cdata/NT2C/noise_synthesizer/pytorch-wgan-master/synthesized_noises/ /cdata/temp/noisy/  /cdata/temp/reweighted/
-
+# python3 add_norm_noise_320.py /cdata/db1/fragmentTEM/clean4/ /cdata/NT2C/noise_synthesizer/pytorch-wgan-master/synthesized_noises/ /cdata/db1/fragmentTEM/noisy4/  /cdata/db1/noiseReweight/
