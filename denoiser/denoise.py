@@ -8,9 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data
 
-
 from utils.data.loader import load_image
-
 
 def load_model(name):
 

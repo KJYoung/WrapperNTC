@@ -1,4 +1,4 @@
-denoiser/__pycache__/*.pyc
+denoiser/__pycache__/*
 denoiser/pretrained/*
 denoiser/trainedModel/*
 denoiser/output/*

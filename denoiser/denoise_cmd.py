@@ -12,7 +12,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 from utils.data.loader import load_image
 from utils.image import downsample
 import mrc as mrc
@@ -73,7 +72,6 @@ def add_arguments(parser):
     parser.add_argument('-j', '--num-threads', type=int, default=0, help='number of threads for pytorch, 0 uses pytorch defaults, <0 uses all cores (default: 0)')
 
     return parser
-
 
 #import topaz.denoise as dn
 #from topaz.utils.image import save_image
@@ -145,9 +143,6 @@ def make_images_datasets(dir_a, dir_b, crop, random=np.random, holdout=0.1, cuto
 
     return dataset_train, dataset_val
 
-
-
-
 def denoise_image(mic, models, lowpass=1, cutoff=0, gaus=None, inv_gaus=None, deconvolve=False
                  , deconv_patch=1, patch_size=-1, padding=0, normalize=False
                  , use_cuda=False):
@@ -194,7 +189,6 @@ def denoise_image(mic, models, lowpass=1, cutoff=0, gaus=None, inv_gaus=None, de
 
 
 def main(args):
-
     # set the number of threads
     num_threads = args.num_threads
     #from topaz.torch import set_num_threads
@@ -451,8 +445,6 @@ def main(args):
             count += 1
             print('# {} of {} completed.'.format(count, total), file=sys.stderr, end='\r')
         print('', file=sys.stderr)
-
-
 
 if __name__ == '__main__':
     import argparse
