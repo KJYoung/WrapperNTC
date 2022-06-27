@@ -291,9 +291,6 @@ class WGAN_GP(object):
                 noise_out_3=mrcfile.new('training_result_images/img_generatori_iter_{}_3.mrc'.format(str(g_iter)),overwrite=True)
                 noise_out_4=mrcfile.new('training_result_images/img_generatori_iter_{}_4.mrc'.format(str(g_iter)),overwrite=True)                
                 noise_arr_0=samples.data.cpu().numpy()[0]
-                #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                #print(noise_arr_0.shape[0],noise_arr_0.shape[1])
-                #print(noise_arr_0)
                 noise_arr_1=samples.data.cpu().numpy()[1]
                 noise_arr_2=samples.data.cpu().numpy()[2]
                 noise_arr_3=samples.data.cpu().numpy()[3]

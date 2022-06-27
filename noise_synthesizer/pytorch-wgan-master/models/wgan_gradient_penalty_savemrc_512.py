@@ -263,17 +263,18 @@ class WGAN_GP(object):
 
                 # Denormalize images and save them in grid 8x8
                 # z = self.get_torch_variable(torch.randn(800, 100, 1, 1))
-                z = self.get_torch_variable(torch.randn(100, 100, 1, 1))
+                z = self.get_torch_variable(torch.randn(64, 100, 1, 1))
                 samples = self.G(z)
                 samples = samples.mul(0.5).add(0.5)
-                samples = samples.data.cpu()[:64]
-                grid = utils.make_grid(samples)
+                samples = samples.data.cpu()
+                grid = utils.make_grid(samples, nrow=8)
                 utils.save_image(grid, 'training_result_images/img_generatori_iter_{}.png'.format(str(g_iter).zfill(3)))
-                #add by lihongjia 
-
-                noise_out_0=mrcfile.new('training_result_images/img_generatori_iter_{}_0.mrc'.format(str(g_iter)),overwrite=True)             
-                noise_arr_0=samples.data.cpu().numpy()[0]
-                noise_out_0.set_data(noise_arr_0)
+                #add by lihongjia
+                
+                with mrcfile.new('training_result_images/img_generatori_iter_{}_0.mrc'.format(str(g_iter)),overwrite=True) as n_out:
+                    n_out.set_data(samples.data.cpu().numpy()[0])
+                with mrcfile.new('training_result_images/img_generatori_iter_{}_1.mrc'.format(str(g_iter)),overwrite=True) as n_out:
+                    n_out.set_data(samples.data.cpu().numpy()[1])
                 # Testing
                 time = t.time() - self.t_begin
                 print("Generator iter: {}".format(g_iter))
