@@ -303,17 +303,17 @@ class WGAN_GP(object):
         if not os.path.exists('synthesized_grid/'): # directory for overview grid images.
             os.makedirs('synthesized_grid/')
         self.load_model(D_model_path, G_model_path)
-        z = self.get_torch_variable(torch.randn(self.batch_size, 100, 1, 1))
+        z = self.get_torch_variable(torch.randn(64, 100, 1, 1))
         samples = self.G(z)
         samples = samples.mul(0.5).add(0.5)
         samples = samples.data.cpu()
         samplesNP = samples.numpy()
-        for sampleNum in range(self.batch_size):
+        for sampleNum in range(64):
             noiseID = startNum + sampleNum
             noise_out=mrcfile.new('synthesized_noises/synthesized_noise_{}.mrc'.format(str(noiseID)), overwrite=False)
             noise_out.set_data(samplesNP[sampleNum])
         grid = utils.make_grid(samples)
-        gridName = 'synthesized_grid/overview_synthesized_{}-{}.png'.format(str(startNum), str(startNum+self.batch_size-1))
+        gridName = 'synthesized_grid/overview_synthesized_{}-{}.png'.format(str(startNum), str(startNum+64-1))
         print("Overview grid of 8x8 images saved to '{}'.".format(gridName))
         utils.save_image(grid, gridName)
     
