@@ -3,8 +3,7 @@ from models.wgan_gradient_penalty_savemrc_512 import WGAN_GP
 
 def main(args):
     model =  WGAN_GP(args)
-    for i in range(320):
-        model.synthesize_noise(1 + 64 * i, args.load_D, args.load_G)
+    model.synthesize_noise(320, args.load_D, args.load_G)
 
 if __name__ == '__main__':
     args = parse_args()
