@@ -314,16 +314,13 @@ def main(args):
                                             , shuffle=shuffle
                                             )
 
-
-
         for epoch,loss_train,loss_val in iterator:
             print(epoch, loss_train, loss_val)
             sys.stdout.flush()
 
             # save the model
-            if args.save_prefix is not None:
+            if args.save_prefix is not None and epoch % 10 == 0:
                 path = args.save_prefix + ('_epoch{:0'+str(digits)+'}.sav').format(epoch) 
-                #path = args.save_prefix + '_epoch{}.sav'.format(epoch)
                 model.cpu()
                 model.eval()
                 torch.save(model, path)
