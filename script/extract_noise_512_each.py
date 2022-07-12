@@ -8,6 +8,8 @@ import mahotas
 import sys,os
 import matplotlib.pyplot as plt
 import pywt
+import time
+import multiprocessing
 
 def is_noise(arr,x0,x1,y0,y1):
     if (x0+x1)%2==0:
@@ -49,37 +51,24 @@ def is_noise(arr,x0,x1,y0,y1):
     # print('True :: std_global: {} | std_1: {} | std_2: {} | std_3: {} | std_4: {} '.format(std_global,std_1,std_2,std_3,std_4))
     return isnoise
 
-denoised_dir    = sys.argv[1]  #micrographs
-raw_dir         = sys.argv[2]  #raw micrographs
-noise_dir       = sys.argv[3]  #noise patches
-draw_dir        = sys.argv[4]  #draw noise 
+denoised_dir    = sys.argv[1]       # micrographs
+raw_dir         = sys.argv[2]       # raw micrographs
+noise_dir       = sys.argv[3]       # noise patches
+draw_dir        = sys.argv[4]       # draw noise 
 worker          = int(sys.argv[5])  # number of workers.
+extractDraw     = bool(sys.argv[6]) # whether save the noiseDraw or not.
 
 box_size=512
-par_size=200
 step=int(0.02*box_size) 
 noise_patch_num=0
 input_list=os.listdir(denoised_dir)
 
-import time 
 script_start = time.time()
 
 # Multi processing!
 print('box_size : {}, step:  {}'.format(box_size, step))
-print(denoised_dir)
-print(raw_dir)
-print(noise_dir)
-print(draw_dir)
-print(worker)
-print("input length :", len(input_list))
-
+# print("input length :", len(input_list))
 jobsNUM = len(input_list) // worker
-
-# from threading import Thread
-# from time import sleep
-
-import multiprocessing
-
     
 def processInputs(input_list):
     file_n = 1
@@ -114,30 +103,29 @@ def processInputs(input_list):
                     cv2.rectangle(denoised_img, (y,x), (y+box_size,x+box_size), (0, 0, 255), 2)
                     noise_patch_n+=1
         #save draw noise
-        if noise_patch_n != 0:
+        if noise_patch_n != 0 and (not extractDraw):
             with mrcfile.new(draw_noise_path,overwrite=True) as draw_noise:
                 draw_noise.set_data(denoised_img)
 
         print(f"All jobs for {input_file} are done. : {file_n} out of {len(input_list)}")
         file_end = time.time()
-        print(f"{file_end - file_start:.5f} sec for this file.")
+        # print(f"{file_end - file_start:.5f} sec for this file.")
         eta_calc = (len(input_list) - file_n) * (file_end-script_start)/file_n
-        print(f"{file_end - script_start:.5f} sec so far. eta : {eta_calc:.5f} sec")
-        print(noise_patch_n, " out of ", patch_n)
+        print(f"{file_end - script_start:.5f} sec so far. eta : {eta_calc:.5f} sec [ ", noise_patch_n, " out of ", patch_n, " ]")
         file_n += 1
 
-def print_sum(*input_list):
-    print("Input length : " , len(input_list), time.ctime())
+def mainTask(*input_list):
+    # print("Input length : " , len(input_list), time.ctime())
     processInputs(list(input_list))
 
 def main():
     threads = []
     for i in range(worker-1):
         print("worker ", i, " will process ", jobsNUM * i , " ~ " , jobsNUM * (i+1) - 1)
-        T = multiprocessing.Process(target=print_sum, args=(input_list[jobsNUM * i : jobsNUM * (i+1)]))
+        T = multiprocessing.Process(target=mainTask, args=(input_list[jobsNUM * i : jobsNUM * (i+1)]))
         threads.append(T)
     print("worker ", i+1, " will process ", jobsNUM * (i+1) , " ~ " , len(input_list)-1)
-    T = multiprocessing.Process(target=print_sum, args=(input_list[jobsNUM * (i+1) : ]))
+    T = multiprocessing.Process(target=mainTask, args=(input_list[jobsNUM * (i+1) : ]))
     threads.append(T)
 
     for t in threads:
@@ -145,7 +133,6 @@ def main():
 
     for process in multiprocessing.active_children():
         process.join()
-        print(process.name, process.pid, process.is_alive())
 
     for process in multiprocessing.active_children():
         print(process.name, process.is_alive())

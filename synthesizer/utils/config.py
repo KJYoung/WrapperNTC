@@ -13,6 +13,7 @@ def parse_args():
     parser.add_argument('--load_D', type=str, default='False', help='Path for loading Discriminator network')
     parser.add_argument('--load_G', type=str, default='False', help='Path for loading Generator network')
     parser.add_argument('--generator_iters', type=int, default=10000, help='The number of iterations for generator in WGAN model.')
+    parser.add_argument('--output_dir', required=True, help='path to output')
     return check_args(parser.parse_args())
 
 

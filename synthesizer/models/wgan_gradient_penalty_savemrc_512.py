@@ -13,7 +13,7 @@ from torchvision import utils
 
 import mrcfile
 
-SAVE_PER_TIMES = 100
+SAVE_PER_TIMES = 200
 
 class Generator(torch.nn.Module):
     def __init__(self, channels):
@@ -116,7 +116,6 @@ class Discriminator(torch.nn.Module):
             # The output of D is no longer a probability, we do not apply sigmoid at the output of D.
             nn.Conv2d(in_channels=1024, out_channels=1, kernel_size=4, stride=1, padding=0))
 
-
     def forward(self, x):
         x = self.main_module(x)
         return self.output(x)
@@ -156,6 +155,8 @@ class WGAN_GP(object):
         self.critic_iter = 5
         self.lambda_term = 10
 
+        self.outputDir = args.output_dir
+
     def get_torch_variable(self, arg):
         if self.cuda:
             #print("cuda index: {}".format(self.cuda_index))
@@ -175,10 +176,8 @@ class WGAN_GP(object):
         else:
             self.cuda = False
 
-
     def train(self, train_loader):
         self.t_begin = t.time()
-        self.file = open("inception_score_graph.txt", "w")
 
         # Now batches are callable self.data.next()
         self.data = self.get_infinite_batches(train_loader)
@@ -210,8 +209,7 @@ class WGAN_GP(object):
 
                 images, z = self.get_torch_variable(images), self.get_torch_variable(z)
 
-                # Train discriminator
-                # WGAN - Training discriminator more iterations than generator
+                # Train discriminator : WGAN - Training discriminator more iterations than generator
                 # Train with real images
                 d_loss_real = self.D(images)
                 d_loss_real = d_loss_real.mean()
@@ -231,7 +229,6 @@ class WGAN_GP(object):
                 #edit by lihongjia 
                 gradient_penalty.backward(retain_graph=True)
 
-
                 d_loss = d_loss_fake - d_loss_real + gradient_penalty
                 Wasserstein_D = d_loss_real - d_loss_fake
                 self.d_optimizer.step()
@@ -242,8 +239,7 @@ class WGAN_GP(object):
                 p.requires_grad = False  # to avoid computation
 
             self.G.zero_grad()
-            # train generator
-            # compute loss with fake images
+            # train generator : compute loss with fake images
             z = self.get_torch_variable(torch.randn(self.batch_size, 100, 1, 1))
             fake_images = self.G(z)
             g_loss = self.D(fake_images)
@@ -258,8 +254,8 @@ class WGAN_GP(object):
             if (g_iter) % SAVE_PER_TIMES == 0:
                 self.save_model()
 
-                if not os.path.exists('training_result_images/'):
-                    os.makedirs('training_result_images/')
+                if not os.path.exists(self.outputDir + 'training_result_images/'):
+                    os.makedirs(self.outputDir + 'training_result_images/')
 
                 # Denormalize images and save them in grid 8x8
                 # z = self.get_torch_variable(torch.randn(800, 100, 1, 1))
@@ -268,21 +264,19 @@ class WGAN_GP(object):
                 samples = samples.mul(0.5).add(0.5)
                 samples = samples.data.cpu()
                 grid = utils.make_grid(samples, nrow=8)
-                utils.save_image(grid, 'training_result_images/img_generatori_iter_{}.png'.format(str(g_iter).zfill(3)))
-                #add by lihongjia
+                utils.save_image(grid, self.outputDir + 'training_result_images/img_generatori_iter_{}.png'.format(str(g_iter).zfill(3)))
                 
-                with mrcfile.new('training_result_images/img_generatori_iter_{}_0.mrc'.format(str(g_iter)),overwrite=True) as n_out:
+                with mrcfile.new(self.outputDir + 'training_result_images/img_generatori_iter_{}_0.mrc'.format(str(g_iter)),overwrite=True) as n_out:
                     n_out.set_data(samples.data.cpu().numpy()[0])
-                with mrcfile.new('training_result_images/img_generatori_iter_{}_1.mrc'.format(str(g_iter)),overwrite=True) as n_out:
+                with mrcfile.new(self.outputDir + 'training_result_images/img_generatori_iter_{}_1.mrc'.format(str(g_iter)),overwrite=True) as n_out:
                     n_out.set_data(samples.data.cpu().numpy()[1])
+                
                 # Testing
                 time = t.time() - self.t_begin
                 print("Generator iter: {}".format(g_iter))
                 print("Time {}".format(time))
-                # Write to file inception_score, gen_iters, time
-                #output = str(g_iter) + " " + str(time) + " " + str(inception_score[0]) + "\n"
+
         print('Time of training-{}'.format((t.time() - self.t_begin)))
-        #self.file.close()
         # Save the trained parameters
         self.save_model()
 
@@ -297,12 +291,12 @@ class WGAN_GP(object):
         print("Grid of 8x8 images saved to 'dgan_model_image.png'.")
         utils.save_image(grid, 'dgan_model_image.png')
 
-    def synthesize_noise(self, loopNum, D_model_path, G_model_path):
-        if not os.path.exists('synthesized_noises/'): # directory for mrc files.
-            os.makedirs('synthesized_noises/')
-        if not os.path.exists('synthesized_grid/'): # directory for overview grid images.
-            os.makedirs('synthesized_grid/')
-        self.load_model(D_model_path, G_model_path)
+    def synthesize_noise(self, loopNum, G_model_path):
+        if not os.path.exists(self.outputDir + 'synthesized_noises/'): # directory for mrc files.
+            os.makedirs(self.outputDir + 'synthesized_noises/')
+        if not os.path.exists(self.outputDir + 'synthesized_grid/'): # directory for overview grid images.
+            os.makedirs(self.outputDir + 'synthesized_grid/')
+        self.load_generator(G_model_path)
 
         for i in range(loopNum):
             startNum = 1 + 64*i
@@ -313,10 +307,10 @@ class WGAN_GP(object):
             samplesNP = samples.numpy()
             for sampleNum in range(64):
                 noiseID = startNum + sampleNum
-                noise_out=mrcfile.new('synthesized_noises/synthesized_noise_{}.mrc'.format(str(noiseID)), overwrite=False)
+                noise_out=mrcfile.new(self.outputDir + 'synthesized_noises/synthesized_noise_{}.mrc'.format(str(noiseID)), overwrite=False)
                 noise_out.set_data(samplesNP[sampleNum])
             grid = utils.make_grid(samples)
-            gridName = 'synthesized_grid/overview_synthesized_{}-{}.png'.format(str(startNum), str(startNum+64-1))
+            gridName = self.outputDir + 'synthesized_grid/overview_synthesized_{}-{}.png'.format(str(startNum), str(startNum+64-1))
             print("Overview grid of 8x8 images saved to '{}'.".format(gridName))
             utils.save_image(grid, gridName)
     
@@ -351,23 +345,6 @@ class WGAN_GP(object):
         grad_penalty = ((gradients.norm(2, dim=1) - 1) ** 2).mean() * self.lambda_term
         return grad_penalty
 
-    '''
-    def real_images(self, images, number_of_images):
-        if (self.C == 3):
-            return self.to_np(images.view(-1, self.C, 32, 32)[:self.number_of_images])
-        else:
-            return self.to_np(images.view(-1, 32, 32)[:self.number_of_images])
-
-    def generate_img(self, z, number_of_images):
-        samples = self.G(z).data.cpu().numpy()[:number_of_images]
-        generated_images = []
-        for sample in samples:
-            if self.C == 3:
-                generated_images.append(sample.reshape(self.C, 32, 32))
-            else:
-                generated_images.append(sample.reshape(32, 32))
-        return generated_images
-    '''
     def real_images(self, images, number_of_images):
         if (self.C == 3):
             return self.to_np(images.view(-1, self.C, 128, 128)[:self.number_of_images])
@@ -388,8 +365,8 @@ class WGAN_GP(object):
         return x.data.cpu().numpy()
 
     def save_model(self):
-        torch.save(self.G.state_dict(), './generator.pkl')
-        torch.save(self.D.state_dict(), './discriminator.pkl')
+        torch.save(self.G.state_dict(), self.outputDir + 'generator.pkl')
+        torch.save(self.D.state_dict(), self.outputDir 'discriminator.pkl')
         print('Models save to ./generator.pkl & ./discriminator.pkl ')
 
     def load_model(self, D_model_filename, G_model_filename):
@@ -399,6 +376,11 @@ class WGAN_GP(object):
         self.G.load_state_dict(torch.load(G_model_path))
         print('Generator model loaded from {}.'.format(G_model_path))
         print('Discriminator model loaded from {}-'.format(D_model_path))
+
+    def load_generator(self, G_model_filename):
+        G_model_path = os.path.join(os.getcwd(), G_model_filename)
+        self.G.load_state_dict(torch.load(G_model_path))
+        print('Generator model loaded from {}.'.format(G_model_path))
 
     def get_infinite_batches(self, data_loader):
         while True:
