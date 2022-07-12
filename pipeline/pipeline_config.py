@@ -5,6 +5,7 @@ import os
 def parse_args():
     parser = argparse.ArgumentParser(description="Pytorch implementation of GAN models.")
     parser.add_argument('--is_train', type=str, default='True')
+    parser.add_argument('--workspace', required=True, help='path to save all the outputs')
     parser.add_argument('--dataroot', required=True, help='path to dataset')
     parser.add_argument('--download', type=str, default='False')
     parser.add_argument('--epochs', type=int, default=50, help='The number of epochs to run')
@@ -14,7 +15,6 @@ def parse_args():
     parser.add_argument('--load_G', type=str, default='False', help='Path for loading Generator network')
     parser.add_argument('--generator_iters', type=int, default=10000, help='The number of iterations for generator in WGAN model.')
     return check_args(parser.parse_args())
-
 
 # Checking arguments
 def check_args(args):
@@ -31,6 +31,5 @@ def check_args(args):
         print('Batch size must be larger than or equal to one')
 
     args.channels = 1
-    
     args.cuda = True if args.cuda == 'True' else False
     return args

@@ -1,10 +1,5 @@
 from utils.config import parse_args
 from utils.data_loader_320 import get_data_loader
-
-from models.gan import GAN
-from models.dcgan import DCGAN_MODEL
-from models.wgan_clipping import WGAN_CP
-#from models.wgan_gradient_penalty import WGAN_GP
 from models.wgan_gradient_practice import WGAN_GP
 
 def main(args):

@@ -4,15 +4,14 @@ import torch.utils.data as data_utils
 from utils.datasets_custom import CustomDataset
 
 def get_data_loader(args):
-    if args.dataset == 'custom':
-        trans = transforms.Compose([
-            transforms.ToPILImage(),            
-            transforms.Resize(256),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, ), (0.5, )),
-        ])
-        train_dataset=CustomDataset(root=args.dataroot, train=True, transform=trans)
-        test_dataset = CustomDataset(root=args.dataroot, train=False, transform=trans)
+    trans = transforms.Compose([
+        transforms.ToPILImage(),            
+        transforms.Resize(256),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, ), (0.5, )),
+    ])
+    train_dataset=CustomDataset(root=args.dataroot, train=True, transform=trans)
+    test_dataset = CustomDataset(root=args.dataroot, train=False, transform=trans)
     # Check if everything is ok with loading datasets
     assert train_dataset
     assert test_dataset
