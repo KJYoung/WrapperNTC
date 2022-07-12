@@ -4,4 +4,5 @@
 (2022/06/01) Added noise synthesizing script. Started 320x320 GAN training.   
 (2022/06/27) Lots of utils. Started 512x512 GAN training(including model adjustments).   
 (2022/06/30) After verification of the GAN performance.   
-(2022/)   
+(2022/07/12) After verification of RANDOM, RandGauss. Clean Repository.   
+()      
