@@ -1,11 +1,9 @@
 ## Pytorch code for GAN models
 This is the pytorch implementation of 3 different GAN models using same convolutional architecture.
 
-
 - DCGAN (Deep convolutional GAN)
 - WGAN-CP (Wasserstein GAN using weight clipping)
 - WGAN-GP (Wasserstein GAN using gradient penalty)
-
 
 
 ## Dependecies
@@ -22,8 +20,6 @@ To install all the dependencies quickly and easily you should use __pip__
 ```python
 pip install -r requirements.txt
 ```
-
-
 
  *Training*
  ---
@@ -60,35 +56,9 @@ Start tensorboard:
 tensorboard --logdir ./logs/
 ```
 
-*Walk in latent space*
----
-*Interpolation between a two random latent vector z over 10 random points, shows that generated samples have smooth transitions.*
-
-
-<img src="images/latent_fashion.png" width="350"> &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;   <img src="images/latent-mnist.png" width="350">
-
-
-
-
-
-*Generated examples MNIST, Fashion-MNIST, CIFAR-10*
----
-
-<img src="images/CIFAR-10.png" width="800">
-
-
-<img src="images/Fashion-MNIST.png" width="770">
-
-<img src="images/MNIST.png" width="800">
-
-
-
 *Inception score*
 ---
   [About Inception score](https://arxiv.org/pdf/1801.01973.pdf)
-
-
-<img src="images/inception_graph_generator_iters.png" width="400" > &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;   <img src="images/inception_graph_time.png" width="400">
 
 
 *Useful Resources*

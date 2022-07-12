@@ -188,8 +188,6 @@ def make_header(shape, cella, cellb, mz=1, dtype=np.float32, order=(1,2,3), dmin
                       )
     return header
 
-
-
 def write(f, array, header=None, extended_header=b'', ax=1, ay=1, az=1, alpha=0, beta=0, gamma=0):
     # make sure the array contains float32
     array = array.astype(np.float32)
