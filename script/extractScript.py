@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import pywt
 import time
 import multiprocessing
+import argparse
 
 def is_noise(arr,x0,x1,y0,y1):
     if (x0+x1)%2==0:
@@ -21,8 +22,8 @@ def is_noise(arr,x0,x1,y0,y1):
     else:
         y1=y1-1
 
-    x_center=int(box_size*0.5)
-    y_center=int(box_size*0.5)
+    x_center=int(extractSize*0.5)
+    y_center=int(extractSize*0.5)
     # print("x0:{}|x1:{}|y0:{}|y1:{}".format(x0,x1,y0,y1))
     crop_1=arr[:y_center,:x_center]
     crop_2=arr[:y_center,x_center:]
@@ -51,23 +52,35 @@ def is_noise(arr,x0,x1,y0,y1):
     # print('True :: std_global: {} | std_1: {} | std_2: {} | std_3: {} | std_4: {} '.format(std_global,std_1,std_2,std_3,std_4))
     return isnoise
 
-denoised_dir    = sys.argv[1]       # micrographs
-raw_dir         = sys.argv[2]       # raw micrographs
-noise_dir       = sys.argv[3]       # noise patches
-draw_dir        = sys.argv[4]       # draw noise 
-worker          = int(sys.argv[5])  # number of workers.
-extractDraw     = bool(sys.argv[6]) # whether save the noiseDraw or not.
+def parse_args_noiseExtract():
+    parser = argparse.ArgumentParser(description="Noise extraction based on coarse denoised samples.")
 
-box_size=512
-step=int(0.02*box_size) 
-noise_patch_num=0
-input_list=os.listdir(denoised_dir)
+    # directories
+    parser.add_argument('--denoised',   type=str, required=True, help='denoised micrographs directory.')
+    parser.add_argument('--raw',        type=str, required=True, help='raw micrographs directory.')
+    parser.add_argument('--noisePatch', type=str, required=True, help='extracted noise Patches target directory.')
+    parser.add_argument('--noiseDraw',  type=str, default='', help='visualization of noise Patches directory.')
+    
+    parser.add_argument('--worker',     type=int, default=1, help='number of workers')
+    parser.add_argument('-s', '--size', type=int, default=512, help='extraction size')
+    return parser.parse_args()
 
-script_start = time.time()
+args = parse_args_noiseExtract()
+denoised_dir    = args.denoised
+raw_dir         = args.raw
+noisePatchDIR   = args.noisePatch
+draw_dir        = args.noiseDraw    # empty string '' if we don't want to generate noiseDraw.
+extractSize     = args.size
+worker          = args.worker
+extractDraw     = False if draw_dir == '' else True
 
-# Multi processing!
-print('box_size : {}, step:  {}'.format(box_size, step))
-# print("input length :", len(input_list))
+step            = int(0.02*extractSize) 
+noise_patch_num = 0
+input_list      = os.listdir(denoised_dir)
+
+script_start    = time.time()
+
+print('extractSize : {}, step:  {}'.format(extractSize, step))
 jobsNUM = len(input_list) // worker
     
 def processInputs(input_list):
@@ -82,26 +95,26 @@ def processInputs(input_list):
         raw_img=(raw_img-np.min(raw_img))/(np.max(raw_img)-np.min(raw_img))*255
         
         w,h=denoised_img.shape
-        noise_patch_path=os.path.join(noise_dir,input_file)
-        draw_noise_path=os.path.join(draw_dir,input_file)
+        noise_patch_path=os.path.join(noisePatchDIR, input_file)
+        draw_noise_path=os.path.join(draw_dir, input_file)
         noise_patch_n=0
         patch_n=0
         for x in range(0,w,step):
             for y in range(0,h,step):
-                if x+box_size>w or y+box_size>h:
+                if x+extractSize>w or y+extractSize>h:
                     continue
-                denoised_arr=denoised_img[x:x+box_size,y:y+box_size]
-                raw_arr=raw_img[x:x+box_size,y:y+box_size]
+                denoised_arr=denoised_img[x:x+extractSize,y:y+extractSize]
+                raw_arr=raw_img[x:x+extractSize,y:y+extractSize]
                 patch_n += 1
-                noise=is_noise(denoised_arr,x,x+box_size,y,y+box_size)
+                noise=is_noise(denoised_arr,x,x+extractSize,y,y+extractSize)
                 if noise:  #save noise patch
                     with mrcfile.new(noise_patch_path[:-4]+'_'+str(noise_patch_n)+'.mrc',overwrite=True) as noise_patch:
                         noise_patch.set_data(raw_arr)
-                    #draw noise patch location.
-                    cv2.rectangle(denoised_img, (y,x), (y+box_size,x+box_size), (0, 0, 255), 2)
+                    
+                    if extractDraw: # draw noise patch location.
+                        cv2.rectangle(denoised_img, (y,x), (y+extractSize,x+extractSize), (0, 0, 255), 2)
                     noise_patch_n+=1
-        #save draw noise
-        if noise_patch_n != 0 and (not extractDraw):
+        if noise_patch_n != 0 and extractDraw: # save draw noise
             with mrcfile.new(draw_noise_path,overwrite=True) as draw_noise:
                 draw_noise.set_data(denoised_img)
 
@@ -117,41 +130,39 @@ def processInputsReport(input_list):
         raw_img=(raw_img-np.min(raw_img))/(np.max(raw_img)-np.min(raw_img))*255
         
         w,h=denoised_img.shape
-        noise_patch_path=os.path.join(noise_dir,input_file)
+        noise_patch_path=os.path.join(noisePatchDIR,input_file)
         draw_noise_path=os.path.join(draw_dir,input_file)
         noise_patch_n=0
         patch_n=0
         for x in range(0,w,step):
             for y in range(0,h,step):
-                if x+box_size>w or y+box_size>h:
+                if x+extractSize>w or y+extractSize>h:
                     continue
-                denoised_arr=denoised_img[x:x+box_size,y:y+box_size]
-                raw_arr=raw_img[x:x+box_size,y:y+box_size]
+                denoised_arr=denoised_img[x:x+extractSize,y:y+extractSize]
+                raw_arr=raw_img[x:x+extractSize,y:y+extractSize]
                 patch_n += 1
-                noise=is_noise(denoised_arr,x,x+box_size,y,y+box_size)
+                noise=is_noise(denoised_arr,x,x+extractSize,y,y+extractSize)
                 if noise:  #save noise patch
                     with mrcfile.new(noise_patch_path[:-4]+'_'+str(noise_patch_n)+'.mrc',overwrite=True) as noise_patch:
                         noise_patch.set_data(raw_arr)
-                    #draw noise patch location.
-                    cv2.rectangle(denoised_img, (y,x), (y+box_size,x+box_size), (0, 0, 255), 2)
+                    if extractDraw: # draw noise patch location.
+                        cv2.rectangle(denoised_img, (y,x), (y+extractSize,x+extractSize), (0, 0, 255), 2)
                     noise_patch_n+=1
-        #save draw noise
-        if noise_patch_n != 0 and (not extractDraw):
+        
+        if noise_patch_n != 0 and extractDraw: # save draw noise
             with mrcfile.new(draw_noise_path,overwrite=True) as draw_noise:
                 draw_noise.set_data(denoised_img)
 
         file_end = time.time()
         eta_calc = (len(input_list) - i) * (file_end-script_start)/i
-        print('# Noise extract in representative thread : [{}/{}] {:.2%} || {:.3f} for this file [{} extracted out of {}] || {:.4f} so far || eta : {:.4f}'.format(i, len(input_list), i/len(input_list),
-                                                                                                                                                                file_end - file_start, noise_patch_n, patch_n,
-                                                                                                                                                                file_end - script_start, eta_calc), file=sys.stdout, end='\r')
+        print('# Noise extract in representative thread : [{}/{}] {:.2%} || {:.3f}s/file [{} extracted] || {:.4f} so far || eta : {:.4f}'.format(i, len(input_list), i/len(input_list),
+                                                                                                                                                file_end - file_start, noise_patch_n,
+                                                                                                                                                file_end - script_start, eta_calc), file=sys.stdout, end='\r')
 
 def mainTask(*input_list):
-    # print("Input length : " , len(input_list), time.ctime())
     processInputs(list(input_list))
 
 def mainTaskReport(*input_list):
-    # print("Input length : " , len(input_list), time.ctime())
     processInputsReport(list(input_list))
 
 def main():

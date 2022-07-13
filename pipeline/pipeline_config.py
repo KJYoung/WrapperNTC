@@ -3,8 +3,9 @@ import os
 
 
 def parse_args_standard():
+    parser = argparse.ArgumentParser(description="Improved Wrapper of NoiseTransfer2Clean.")
+    
     # Basic Parameters
-    parser = argparse.ArgumentParser(description="Pytorch implementation of GAN models.")
     parser.add_argument('--nt2cDir', required=True, help='path to nt2c.')
     parser.add_argument('--workspace', required=True, help='path to save all the outputs.')
     parser.add_argument('--noisy', required=True, help='path to noisy dataset.')
@@ -19,6 +20,7 @@ def parse_args_standard():
     parser.add_argument('--fineEpochs', default=400, type=int, help='fine denoiser training epochs (default: 400).')
     parser.add_argument('--fineBatch', default=4, type=int, help='fine denoiser training batch size (default: 4).')
     parser.add_argument('--fineLR', default=0.002, type=float, help='fine denoiser training learning rate (* default: 0.002 *).')
+    
     # Bypass Options.
     parser.add_argument('--coarseModel', default='', type=str, help='already trained coarse denoiser model path to skip step 1.')
     parser.add_argument('--coarseDenoised', default='', type=str, help='already coarse denoised inputs path to skip step 1~2.')
@@ -30,6 +32,7 @@ def parse_args_standard():
     parser.add_argument('--noiseReweight', default='', type=str, help='already reweighted noisy patches path to skip step 6 partially.')
     parser.add_argument('--bulkRenamed', default='', type=str, help='already paired bulkRenamed clean patches path to skip step 7 partially.')
     parser.add_argument('--fineModel', default='', type=str, help='already trained fine denoiser path to skip step 1~7 entirely.')
+    
     # Debugging Options.
     parser.add_argument('--extractDraw', dest='extractDraw', action='store_true', help='save noiseDraw during step 3 if this option is flagged.')
     parser.add_argument('--synGrid',     dest='synGrid',     action='store_true', help='save overview grid during step 5 if this option is flagged.')

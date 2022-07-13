@@ -1,7 +1,6 @@
 import argparse
 import os
 
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Pytorch implementation of GAN models.")
     parser.add_argument('--is_train', type=str, default='True')
@@ -20,8 +19,6 @@ def parse_args():
     
     return check_args(parser.parse_args())
 
-
-# Checking arguments
 def check_args(args):
     # --epoch
     try:

@@ -99,7 +99,11 @@ def main(args):
         if extractDraw:
             if not os.path.exists(noiseDrawDIR):        # directory for visualization of extraction.
                 os.makedirs(noiseDrawDIR)
-        status3 = os.system(f'python {NT2CDIR}script/extract_noise_512_each.py {coarseDenoisedDIR} {rawDataDIR} {noisePatchDIR} {noiseDrawDIR} {extractCore} {extractDraw} 2> {workspaceDIR}noiseExtractSTDERR.log')
+
+        noiseDrawOption = '' if extractDraw == False else f'--noiseDraw {noiseDrawDIR}'
+        # print(f'python {NT2CDIR}script/extract_noise_512_each.py --denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 2> {workspaceDIR}noiseExtractSTDERR.log')
+        # assert False
+        status3 = os.system(f'python {NT2CDIR}script/extractScript.py --denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 2> {workspaceDIR}noiseExtractSTDERR.log')
         if status3 != 0:
             print("----Step 3 was not successfully finished with error code {}".format(status3))
             quit()
