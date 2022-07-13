@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 import numpy as np
 from scipy.optimize import leastsq
 import sys,os
@@ -6,7 +5,6 @@ import cv2
 import operator
 import mrcfile
 import random
-
 from functools import reduce
 
 def func(p,x,y,noise_mean):
@@ -14,7 +12,6 @@ def func(p,x,y,noise_mean):
     return k1*x+k2*(y-noise_mean)+b
 
 def error(p,x,y,noise_mean,z):
-    #print(s)
     return func(p,x,y,noise_mean)-z 
 
 def fit_noise(clean,noise,noisy):
@@ -38,10 +35,11 @@ def fit_noise(clean,noise,noisy):
 
     return k1,k2,b
     
-clean_dir=sys.argv[1]
-noise_dir=sys.argv[2]
-noisy_dir=sys.argv[3]
-noisy_gen_dir=sys.argv[4]
+clean_dir       = sys.argv[1]
+noise_dir       = sys.argv[2]
+noisy_dir       = sys.argv[3]
+noisy_gen_dir   = sys.argv[4]
+augNum          = int(sys.argv[5])
 
 clean_list =os.listdir(clean_dir)
 noise_list=os.listdir(noise_dir)
@@ -49,10 +47,9 @@ noisy_list=os.listdir(noisy_dir)
 noise_len=len(noise_list)
 
 for clean_img in clean_list:
-    for reIndex in range(2): # 16000 * 2 = 32000
-        #assert False
+    for reIndex in range(augNum): # 16000 * 2 = 32000
         rand1=random.randint(0,noise_len-1)
-        print(noisy_gen_dir+clean_img[:-4]+"_{}".format(reIndex)+".mrc" + " | with noise {}".format(rand1))
+        # print(noisy_gen_dir+clean_img[:-4]+"_{}".format(reIndex)+".mrc" + " | with noise {}".format(rand1))
         # rand1=0 # Fix for merge. ##################################################
         clean_path=os.path.join(clean_dir,clean_img)
         noisy_path=os.path.join(noisy_dir,clean_img)

@@ -176,7 +176,7 @@ class WGAN_GP(object):
         else:
             self.cuda = False
 
-    def train(self, train_loader):
+    def train(self, train_loader, synGrid):
         self.t_begin = t.time()
 
         # Now batches are callable self.data.next()
@@ -263,13 +263,13 @@ class WGAN_GP(object):
                 samples = self.G(z)
                 samples = samples.mul(0.5).add(0.5)
                 samples = samples.data.cpu()
-                grid = utils.make_grid(samples, nrow=8)
-                utils.save_image(grid, self.outputDir + 'training_result_images/img_generatori_iter_{}.png'.format(str(g_iter).zfill(3)))
+
+                if synGrid:
+                    grid = utils.make_grid(samples, nrow=8)
+                    utils.save_image(grid, self.outputDir + 'training_result_images/img_generatori_iter_{}.png'.format(str(g_iter).zfill(3)))
                 
-                with mrcfile.new(self.outputDir + 'training_result_images/img_generatori_iter_{}_0.mrc'.format(str(g_iter)),overwrite=True) as n_out:
+                with mrcfile.new(self.outputDir + 'training_result_images/img_generatori_iter_{}.mrc'.format(str(g_iter)),overwrite=True) as n_out:
                     n_out.set_data(samples.data.cpu().numpy()[0])
-                with mrcfile.new(self.outputDir + 'training_result_images/img_generatori_iter_{}_1.mrc'.format(str(g_iter)),overwrite=True) as n_out:
-                    n_out.set_data(samples.data.cpu().numpy()[1])
                 
                 # Testing
                 time = t.time() - self.t_begin
@@ -291,10 +291,10 @@ class WGAN_GP(object):
         print("Grid of 8x8 images saved to 'dgan_model_image.png'.")
         utils.save_image(grid, 'dgan_model_image.png')
 
-    def synthesize_noise(self, loopNum, G_model_path):
+    def synthesize_noise(self, loopNum, synGrid, G_model_path):
         if not os.path.exists(self.outputDir + 'synthesized_noises/'): # directory for mrc files.
             os.makedirs(self.outputDir + 'synthesized_noises/')
-        if not os.path.exists(self.outputDir + 'synthesized_grid/'): # directory for overview grid images.
+        if synGrid and (not os.path.exists(self.outputDir + 'synthesized_grid/')): # directory for overview grid images.
             os.makedirs(self.outputDir + 'synthesized_grid/')
         self.load_generator(G_model_path)
 
@@ -309,10 +309,13 @@ class WGAN_GP(object):
                 noiseID = startNum + sampleNum
                 noise_out=mrcfile.new(self.outputDir + 'synthesized_noises/synthesized_noise_{}.mrc'.format(str(noiseID)), overwrite=False)
                 noise_out.set_data(samplesNP[sampleNum])
-            grid = utils.make_grid(samples)
-            gridName = self.outputDir + 'synthesized_grid/overview_synthesized_{}-{}.png'.format(str(startNum), str(startNum+64-1))
-            print("Overview grid of 8x8 images saved to '{}'.".format(gridName))
-            utils.save_image(grid, gridName)
+
+            if synGrid:
+                grid = utils.make_grid(samples)
+                gridName = self.outputDir + 'synthesized_grid/overview_synthesized_{}-{}.png'.format(str(startNum), str(startNum+64-1))
+                utils.save_image(grid, gridName)
+            if i % 20 == 0:
+                print("Synthesize {} done.".format(i))
     
     def calculate_gradient_penalty(self, real_images, fake_images):
         eta = torch.FloatTensor(self.batch_size,1,1,1).uniform_(0,1)
@@ -366,7 +369,7 @@ class WGAN_GP(object):
 
     def save_model(self):
         torch.save(self.G.state_dict(), self.outputDir + 'generator.pkl')
-        torch.save(self.D.state_dict(), self.outputDir 'discriminator.pkl')
+        torch.save(self.D.state_dict(), self.outputDir + 'discriminator.pkl')
         print('Models save to ./generator.pkl & ./discriminator.pkl ')
 
     def load_model(self, D_model_filename, G_model_filename):
