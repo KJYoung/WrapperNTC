@@ -11,7 +11,7 @@ for i, srcName in enumerate(input_list, start=1):
         dstName = srcName[:-4] + "_{}".format(j) + ".mrc"
         command = "cp {}{} {}{}".format(srcDir, srcName, dstDir, dstName)
         os.system(command)
-    print('# [{}/{}] {:.2%}'.format(i, len(input_list), i/len(input_list)), file=sys.stderr, end='\r')
+    print('# bulkRenamer : [{}/{}] {:.2%}'.format(i, len(input_list), i/len(input_list)), file=sys.stderr, end='\r')
     # print("Jobs for {}".format(srcName))
 print("All jobs done.")
 

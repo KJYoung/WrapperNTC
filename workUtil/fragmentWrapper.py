@@ -71,7 +71,7 @@ def fragmentMRC(inputFile, size, inputIdent, outputIdent):
         for w in range(wfactor):
             for h in range(hfactor):
                 patchName = "{}_w{}_h{}.mrc".format(identifier, w , h)
-                with mrcfile.new(outputIdent + patchName) as mrcPat:
+                with mrcfile.new(outputIdent + patchName, overwrite=True) as mrcPat:
                     mrcPat.set_data(mrc.data[:, w * size : (w+1) * size , h * size : (h+1) * size ])
                     # print("  patch Name : {}".format(patchName))
                     # print("    patches : ({},{}) ~ ({},{}) ".format(w * size, h * size, w * size + size - 1, h * size + size -1))
@@ -108,11 +108,11 @@ if __name__ == '__main__':
             mergeMRC(args)
         else:
             input_list = os.listdir(args.data)
-            for i in input_list:
-                fileName = args.data + i
+            for i, item in enumerate(input_list):
+                fileName = args.data + item
                 if fileName.endswith('.mrc'):
-                    # print(fileName)
-                    fragmentMRC(fileName, args.size, i, args.iden)
+                    fragmentMRC(fileName, args.size, item, args.iden)
+                print('# fragmentWrapper : [{}/{}] {:.2%}'.format(i, len(input_list), i/len(input_list)), file=sys.stderr, end='\r')
 
 # python fragmentWrapper.py -s 256 -d /cdata/WrapperTEM/Micrographs/noisy4/ -id /cdata/db1/fragmentedTEM/
 # python /cdata/workspace/fragmentWrapper.py -s 512 -d /cdata/WrapperTEM/Micrographs/noisy4/ -id /cdata/db1/size512/fragments/noisy4

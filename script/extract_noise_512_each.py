@@ -142,7 +142,7 @@ def processInputsReport(input_list):
 
         file_end = time.time()
         eta_calc = (len(input_list) - i) * (file_end-script_start)/i
-        print('# Progress in one representative thread [{}/{}] {:.2%} || {:.3f} for this file [{} extracted out of {}] || {:.4f} so far || eta : {:.4f}'.format(i, len(input_list), i/len(input_list),
+        print('# Noise extract in representative thread : [{}/{}] {:.2%} || {:.3f} for this file [{} extracted out of {}] || {:.4f} so far || eta : {:.4f}'.format(i, len(input_list), i/len(input_list),
                                                                                                                                                                 file_end - file_start, noise_patch_n, patch_n,
                                                                                                                                                                 file_end - script_start, eta_calc), file=sys.stdout, end='\r')
 

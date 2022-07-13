@@ -134,7 +134,6 @@ def main(args):
         print("---- Step 5 skipped.")
     else:
         if cudaDevice >= 0:
-            print(synGrid)
             if synGrid:
                 status5 = os.system(f'CUDA_VISIBLE_DEVICES={cudaDevice} python {NT2CDIR}synthesizer/main_generateV_512.py --batch_size 64 --dataroot / --cuda True --output_dir {workspaceDIR} --load_G {generatorPath} --synNum64 {synNum64} --synGrid 2> /dev/null')
             else:

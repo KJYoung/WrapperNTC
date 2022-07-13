@@ -307,7 +307,7 @@ class WGAN_GP(object):
             samplesNP = samples.numpy()
             for sampleNum in range(64):
                 noiseID = startNum + sampleNum
-                noise_out=mrcfile.new(self.outputDir + 'synthesized_noises/synthesized_noise_{}.mrc'.format(str(noiseID)), overwrite=False)
+                noise_out=mrcfile.new(self.outputDir + 'synthesized_noises/synthesized_noise_{}.mrc'.format(str(noiseID)), overwrite=True)
                 noise_out.set_data(samplesNP[sampleNum])
 
             if synGrid:
