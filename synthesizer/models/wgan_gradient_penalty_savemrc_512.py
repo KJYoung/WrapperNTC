@@ -128,7 +128,7 @@ class Discriminator(torch.nn.Module):
 
 class WGAN_GP(object):
     def __init__(self, args):
-        print("WGAN_GradientPenalty init model.")
+        # print("WGAN_GradientPenalty init model.")
         self.G = Generator(args.channels)
         self.D = Discriminator(args.channels)
         self.C = args.channels
@@ -165,14 +165,14 @@ class WGAN_GP(object):
             return Variable(arg)
 
     def check_cuda(self, cuda_flag=False):
-        print(cuda_flag)
+        # print(cuda_flag)
         if cuda_flag:
             self.cuda_index = 0
             self.cuda = True
             self.D.cuda(self.cuda_index)
             self.G.cuda(self.cuda_index)
-            #print("cuda index: {}".format(self.cuda_index))
-            print("Cuda enabled flag: {}".format(self.cuda))
+            # print("cuda index: {}".format(self.cuda_index))
+            # print("Cuda enabled flag: {}".format(self.cuda))
         else:
             self.cuda = False
 

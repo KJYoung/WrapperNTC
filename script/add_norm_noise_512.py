@@ -46,7 +46,7 @@ noise_list=os.listdir(noise_dir)
 noisy_list=os.listdir(noisy_dir)
 noise_len=len(noise_list)
 
-for clean_img in clean_list:
+for i, clean_img in enumerate(clean_list):
     for reIndex in range(augNum): # 16000 * 2 = 32000
         rand1=random.randint(0,noise_len-1)
         # print(noisy_gen_dir+clean_img[:-4]+"_{}".format(reIndex)+".mrc" + " | with noise {}".format(rand1))
@@ -67,12 +67,12 @@ for clean_img in clean_list:
         k1,k2,b=fit_noise(clean,noise,noisy)
         # print('k1,k2,b: {}, {}, {}'.format(k1,k2,b))
         noisy_gen=k1*clean+k2*(noise-np.mean(noise))+b+(noise-np.mean(noise))
-        # (1, 128, 128) -> (128, 128)
-        noisy_gen = noisy_gen.reshape((noisy_gen.shape[1],noisy_gen.shape[2]))
+        noisy_gen = noisy_gen.reshape((noisy_gen.shape[1],noisy_gen.shape[2])) # (1, C, C) -> (C, C)
         # print("noisy_gen : ", noisy_gen.shape)
         fit_noisy_out=mrcfile.new(noisy_gen_dir+clean_img[:-4]+"_{}".format(reIndex)+".mrc",overwrite=True)
         fit_noisy_out.set_data(noisy_gen.astype(np.float32))
+        
+    print('# [{}/{}] {:.2%}'.format(i, len(clean_list), i/len(clean_list)), file=sys.stderr, end='\r')
 
-# This file add_norm_noise_128 for now.
 # python3 add_norm_noise_320.py /cdata/temp/clean/ /cdata/NT2C/noise_synthesizer/pytorch-wgan-master/synthesized_noises/ /cdata/temp/noisy/  /cdata/temp/reweighted/
 # python3 add_norm_noise_512.py /cdata/db1/fragmentTEM/clean4/ /cdata/NT2C/noise_synthesizer/pytorch-wgan-master/synthesized_noises/ /cdata/db1/fragmentTEM/noisy4/  /cdata/db1/noiseReweight/

@@ -60,11 +60,11 @@ def check_args(args):
 #################### MAIN ####################
 def fragmentMRC(inputFile, size, inputIdent, outputIdent):
     with mrcfile.open(inputFile) as mrc:
-        print("Input file shape is : ", mrc.data.shape)
+        # print("Input file shape is : ", mrc.data.shape)
         assert mrc.data.shape[1] % size == 0
         assert mrc.data.shape[2] % size == 0
         wfactor, hfactor = (mrc.data.shape[1] // size), (mrc.data.shape[2] // size)
-        print("Output patches will be generated : {} x {} patches".format(wfactor, hfactor))
+        # print("Output patches will be generated : {} x {} patches".format(wfactor, hfactor))
         
         identifier = inputIdent[:len(inputFile) - 4]
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
             for i in input_list:
                 fileName = args.data + i
                 if fileName.endswith('.mrc'):
-                    print(fileName)
+                    # print(fileName)
                     fragmentMRC(fileName, args.size, i, args.iden)
 
 # python fragmentWrapper.py -s 256 -d /cdata/WrapperTEM/Micrographs/noisy4/ -id /cdata/db1/fragmentedTEM/

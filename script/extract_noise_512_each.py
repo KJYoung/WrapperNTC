@@ -71,10 +71,8 @@ print('box_size : {}, step:  {}'.format(box_size, step))
 jobsNUM = len(input_list) // worker
     
 def processInputs(input_list):
-    file_n = 1
     for input_file in input_list:
         file_start = time.time()
-        print("Now extracting from ...", os.path.join(denoised_dir,input_file))
         denoised_img=mrcfile.open(os.path.join(denoised_dir,input_file),permissive=True)
         denoised_img=denoised_img.data
         denoised_img=(denoised_img-np.min(denoised_img))/(np.max(denoised_img)-np.min(denoised_img))*255
@@ -107,37 +105,79 @@ def processInputs(input_list):
             with mrcfile.new(draw_noise_path,overwrite=True) as draw_noise:
                 draw_noise.set_data(denoised_img)
 
-        print(f"All jobs for {input_file} are done. : {file_n} out of {len(input_list)}")
+def processInputsReport(input_list):
+    for i, input_file in enumerate(input_list, start=1):
+        file_start = time.time()
+        denoised_img=mrcfile.open(os.path.join(denoised_dir,input_file),permissive=True)
+        denoised_img=denoised_img.data
+        denoised_img=(denoised_img-np.min(denoised_img))/(np.max(denoised_img)-np.min(denoised_img))*255
+
+        raw_img=mrcfile.open(os.path.join(raw_dir,input_file),permissive=True)
+        raw_img=raw_img.data
+        raw_img=(raw_img-np.min(raw_img))/(np.max(raw_img)-np.min(raw_img))*255
+        
+        w,h=denoised_img.shape
+        noise_patch_path=os.path.join(noise_dir,input_file)
+        draw_noise_path=os.path.join(draw_dir,input_file)
+        noise_patch_n=0
+        patch_n=0
+        for x in range(0,w,step):
+            for y in range(0,h,step):
+                if x+box_size>w or y+box_size>h:
+                    continue
+                denoised_arr=denoised_img[x:x+box_size,y:y+box_size]
+                raw_arr=raw_img[x:x+box_size,y:y+box_size]
+                patch_n += 1
+                noise=is_noise(denoised_arr,x,x+box_size,y,y+box_size)
+                if noise:  #save noise patch
+                    with mrcfile.new(noise_patch_path[:-4]+'_'+str(noise_patch_n)+'.mrc',overwrite=True) as noise_patch:
+                        noise_patch.set_data(raw_arr)
+                    #draw noise patch location.
+                    cv2.rectangle(denoised_img, (y,x), (y+box_size,x+box_size), (0, 0, 255), 2)
+                    noise_patch_n+=1
+        #save draw noise
+        if noise_patch_n != 0 and (not extractDraw):
+            with mrcfile.new(draw_noise_path,overwrite=True) as draw_noise:
+                draw_noise.set_data(denoised_img)
+
         file_end = time.time()
-        # print(f"{file_end - file_start:.5f} sec for this file.")
-        eta_calc = (len(input_list) - file_n) * (file_end-script_start)/file_n
-        print(f"{file_end - script_start:.5f} sec so far. eta : {eta_calc:.5f} sec [ ", noise_patch_n, " out of ", patch_n, " ]")
-        file_n += 1
+        eta_calc = (len(input_list) - i) * (file_end-script_start)/i
+        print('# Progress in one representative thread [{}/{}] {:.2%} || {:.3f} for this file [{} extracted out of {}] || {:.4f} so far || eta : {:.4f}'.format(i, len(input_list), i/len(input_list),
+                                                                                                                                                                file_end - file_start, noise_patch_n, patch_n,
+                                                                                                                                                                file_end - script_start, eta_calc), file=sys.stdout, end='\r')
 
 def mainTask(*input_list):
     # print("Input length : " , len(input_list), time.ctime())
     processInputs(list(input_list))
 
+def mainTaskReport(*input_list):
+    # print("Input length : " , len(input_list), time.ctime())
+    processInputsReport(list(input_list))
+
 def main():
-    threads = []
-    for i in range(worker-1):
-        print("worker ", i, " will process ", jobsNUM * i , " ~ " , jobsNUM * (i+1) - 1)
-        T = multiprocessing.Process(target=mainTask, args=(input_list[jobsNUM * i : jobsNUM * (i+1)]))
+    if worker > 1: # Multithreading
+        threads = []
+        for i in range(worker-1):
+            print("worker ", i, " will process ", jobsNUM * i , " ~ " , jobsNUM * (i+1) - 1)
+            T = multiprocessing.Process(target=mainTask, args=(input_list[jobsNUM * i : jobsNUM * (i+1)]))
+            threads.append(T)
+        print("worker ", i+1, " will process ", jobsNUM * (i+1) , " ~ " , len(input_list)-1)
+        T = multiprocessing.Process(target=mainTask, args=(input_list[jobsNUM * (i+1) : ]))
         threads.append(T)
-    print("worker ", i+1, " will process ", jobsNUM * (i+1) , " ~ " , len(input_list)-1)
-    T = multiprocessing.Process(target=mainTask, args=(input_list[jobsNUM * (i+1) : ]))
-    threads.append(T)
 
-    for t in threads:
-        t.start()
+        for t in threads:
+            t.start()
 
-    for process in multiprocessing.active_children():
-        process.join()
+        for process in multiprocessing.active_children():
+            process.join()
 
-    for process in multiprocessing.active_children():
-        print(process.name, process.is_alive())
+        for process in multiprocessing.active_children():
+            print(process.name, process.is_alive())
+    elif worker == 1:
+        processInputsReport(input_list)
+    else:
+        print("Worker should be >= 1.")
+        assert False
 
 if __name__ == "__main__":
     main()
-
-print("---------------- extract_noise job is end ----------------")

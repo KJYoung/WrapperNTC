@@ -7,8 +7,8 @@ def parse_args_standard():
     parser = argparse.ArgumentParser(description="Pytorch implementation of GAN models.")
     parser.add_argument('--nt2cDir', required=True, help='path to nt2c.')
     parser.add_argument('--workspace', required=True, help='path to save all the outputs.')
-    parser.add_argument('--clean', required=True, help='path to clean dataset.')
     parser.add_argument('--noisy', required=True, help='path to noisy dataset.')
+    parser.add_argument('--clean', required=True, help='path to clean dataset.')
     parser.add_argument('--raw', required=True, help='path to raw micrographs dataset.')
     parser.add_argument('-d', '--device', default=0, type=int, help='which device to use, set to -1 to force CPU (default: 0).')
     parser.add_argument('--coarseEpochs', default=100, type=int, help='coarse denoiser training epochs (default: 100).')
@@ -31,25 +31,25 @@ def parse_args_standard():
     parser.add_argument('--bulkRenamed', default='', type=str, help='already paired bulkRenamed clean patches path to skip step 7 partially.')
     parser.add_argument('--fineModel', default='', type=str, help='already trained fine denoiser path to skip step 1~7 entirely.')
     # Debugging Options.
-    parser.add_argument('--extractDraw', default=False, type=bool, help='save noiseDraw during step 3 if this option is true.')
-    parser.add_argument('--synGrid', dest='synGrid', action='store_true', help='save overview grid during step 5 if this option is flagged.')
-    parser.add_argument('--trainGrid', default=True, type=bool, help='save overview grid during step 4 if this option is true.')
+    parser.add_argument('--extractDraw', dest='extractDraw', action='store_true', help='save noiseDraw during step 3 if this option is flagged.')
+    parser.add_argument('--synGrid',     dest='synGrid',     action='store_true', help='save overview grid during step 5 if this option is flagged.')
+    parser.add_argument('--trainGrid',   dest='trainGrid',   action='store_true', help='save overview grid during step 4 if this option is flagged.')
     return check_args(parser.parse_args())
 
 # Checking arguments
 def check_args(args):
     # --extractCores
     try:
-        assert args.extractCores >= 2
+        assert args.extractCores >= 1
     except:
-        print('extractCores must be larger than or equal to two')
+        print('extractCores must be >= 1')
         quit()
     
     # --augNum
     try:
         assert args.extractCores >= 1
     except:
-        print('augNum must be larger than or equal to one')
+        print('augNum must be >= 1')
         quit()
 
     # --coarseEpochs
@@ -86,7 +86,7 @@ def check_args(args):
         quit()
     if not args.nt2cDir.endswith('/'):
         print('WARNING : nt2cDir option should end with "/"!')
-        args.nt2cDir = args.nt2Dir + '/'
+        args.nt2cDir = args.nt2cDir + '/'
     
     # --workspace
     if not os.path.exists(args.workspace):

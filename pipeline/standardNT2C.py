@@ -57,7 +57,7 @@ def main(args):
     skipStep7           = False if (fineModel == '') else True
 
     # 1. Coarse Denoiser Training. #####################################################################################################################
-    print("--Step 1 : Coarse Denoiser Training! --")
+    print("--Step 1 : Coarse Denoiser Training! -----------------------------------------------")
     step1StartTime      = time.time()
     if skipStep1:
         print("---- Step 1 skipped.")
@@ -70,7 +70,7 @@ def main(args):
             quit()
         print("----Elapsed time for step 1 : {} seconds".format(time.time() - step1StartTime))
     # 2. Coarse Denoise Raw Micrographs. #####################################################################################################################
-    print("--Step 2 : Coarse Denoising! --")
+    print("--Step 2 : Coarse Denoising! -------------------------------------------------------")
     step2StartTime      = time.time()
     if skipStep2:
         print("---- Step 2 skipped.")
@@ -89,7 +89,7 @@ def main(args):
             quit()
         print("----Elapsed time for step 2 : {} seconds".format(time.time() - step2StartTime))
     # 3. Noise extract. #####################################################################################################################
-    print("--Step 3 : Noise extraction! --")
+    print("--Step 3 : Noise extraction! -------------------------------------------------------")
     step3StartTime      = time.time()
     if skipStep3:
         print("---- Step 3 skipped.")
@@ -105,22 +105,30 @@ def main(args):
             quit()
         print("----Elapsed time for step 3 : {} seconds".format(time.time() - step3StartTime))
     # 4. GAN noise synthesizer training. #####################################################################################################################
-    print("--Step 4 : GAN noise synthesizer training! --")
+    print("--Step 4 : GAN noise synthesizer training! -----------------------------------------")
     step4StartTime      = time.time()
     if skipStep4:
         print("---- Step 4 skipped.")
     else:
+        GANtrainDataDIR = (workspaceDIR + "noisePatch/") if noisePatch == "" else noisePatch
+
         if cudaDevice >= 0:
-            status4 = os.system(f'CUDA_VISIBLE_DEVICES={cudaDevice} python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {workspaceDIR}noisePatch/ --cuda True --generator_iters {generatorIter} --output_dir {workspaceDIR} --synGrid {trainGrid} > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
+            if trainGrid:
+                status4 = os.system(f'CUDA_VISIBLE_DEVICES={cudaDevice} python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda True --generator_iters {generatorIter} --output_dir {workspaceDIR} --synGrid > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
+            else:
+                status4 = os.system(f'CUDA_VISIBLE_DEVICES={cudaDevice} python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda True --generator_iters {generatorIter} --output_dir {workspaceDIR} > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
         else:
-            status4 = os.system(f'python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {workspaceDIR}noisePatch/ --cuda False --generator_iters {generatorIter} --output_dir {workspaceDIR} --synGrid {trainGrid} > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
+            if trainGrid:
+                status4 = os.system(f'python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda False --generator_iters {generatorIter} --output_dir {workspaceDIR} --synGrid > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
+            else:
+                status4 = os.system(f'python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda False --generator_iters {generatorIter} --output_dir {workspaceDIR} > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
         if status4 != 0:
             print("----Step 4 was not successfully finished with error code {}".format(status4))
             quit()
         print("----Elapsed time for step 4 : {} seconds".format(time.time() - step4StartTime))
 
     # 5. GAN noise synthesize. #####################################################################################################################
-    print("--Step 5 : Noise synthesize! --")
+    print("--Step 5 : Noise synthesize! -------------------------------------------------------")
     step5StartTime      = time.time()
     if skipStep5:
         print("---- Step 5 skipped.")
@@ -141,7 +149,7 @@ def main(args):
             quit()
         print("----Elapsed time for step 5 : {} seconds".format(time.time() - step5StartTime))
     # 6. Fragment then Noise reweighting. #####################################################################################################################
-    print("--Step 6 : Fragment then Noise reweighting! --")
+    print("--Step 6 : Fragment then Noise reweighting! -----------------------------------------")
     step6StartTime      = time.time()
 
     if skipStep6:
@@ -172,7 +180,7 @@ def main(args):
         
         print("----Elapsed time for step 6 : {} seconds".format(time.time() - step6StartTime))
     # 7. Bulk rename and Fine Denoiser training. #####################################################################################################################
-    print("--Step 7 : Bulk rename and Fine Denoiser training! --")
+    print("--Step 7 : Bulk rename and Fine Denoiser training! -----------------------------------------")
     step7StartTime      = time.time()
 
     if skipStep7:
@@ -194,10 +202,10 @@ def main(args):
             quit()
         print("----Elapsed time for step 7 : {} seconds".format(time.time() - step7StartTime))
     # 8. Fine denoise raw micrographs. #####################################################################################################################
-    print("--Step 8 : Fine denoise raw micrographs! --")
+    print("--Step 8 : Fine denoise raw micrographs! -----------------------------------------")
     step8StartTime      = time.time()
     if not os.path.exists(fineDenoisedDIR):   # directory for fine denoised Raw micrographs.
-        os.makedirs(fineDenoisedDIR))
+        os.makedirs(fineDenoisedDIR)
         
     if skipStep7:
         fineModelPath = fineModel
@@ -222,7 +230,8 @@ def main(args):
         resultLOG.write("Elapsed time for step7 : {}\n".format(step8StartTime - step7StartTime))
         resultLOG.write("Elapsed time for step8 : {}\n".format(time.time()    - step8StartTime))
         resultLOG.write("Total Elapsed time     : {}\n".format(time.time() - pipelineStartTime))
-        resultLOG.write("---------- SUMMARY 2 : parameters statistics ---------------------------------------------------\n")
+        resultLOG.write("\n\n")
+        resultLOG.write("---------- SUMMARY 2 : parameters statistics ---------------------------------------------\n")
         resultLOG.write("BASIC PARAMETERS ==========================\n")
         resultLOG.write("used NT2CDIR           : {}\n".format(NT2CDIR))
         resultLOG.write("workspaceDIR           : {}\n".format(workspaceDIR))
@@ -232,30 +241,31 @@ def main(args):
         resultLOG.write("coarseEpochs           : {}\n".format(coarseEpochs))
         resultLOG.write("rawDataDIR             : {}\n".format(rawDataDIR))
         resultLOG.write("extractCore            : {}\n".format(extractCore))
-        resultLOG.write("generatorIter           : {}\n".format())
-        resultLOG.write("synNum64           : {}\n".format())
-        resultLOG.write("augNum           : {}\n".format())
-        resultLOG.write("fineEpochs           : {}\n".format())
-        resultLOG.write("fineBatch           : {}\n".format())
-        resultLOG.write("fineLR           : {}\n".format())
+        resultLOG.write("generatorIter          : {}\n".format(generatorIter))
+        resultLOG.write("synNum64               : {}\n".format(synNum64))
+        resultLOG.write("augNum                 : {}\n".format(augNum))
+        resultLOG.write("fineEpochs             : {}\n".format(fineEpochs))
+        resultLOG.write("fineBatch              : {}\n".format(fineBatch))
+        resultLOG.write("fineLR                 : {}\n".format(fineLR))
         resultLOG.write("\n\n")
         resultLOG.write("BYPASS PARAMETERS ==========================\n")
         resultLOG.write("coarseModel            : {}\n".format(coarseModel))
         resultLOG.write("coarseDenoised         : {}\n".format(coarseDenoised))
-        resultLOG.write("noisePatch           : {}\n".format())
-        resultLOG.write("loadGenerator           : {}\n".format())
-        resultLOG.write("synNoise           : {}\n".format())
-        resultLOG.write("fragmentNoisy           : {}\n".format())
-        resultLOG.write("fragmentClean           : {}\n".format())
-        resultLOG.write("noiseReweight           : {}\n".format())
-        resultLOG.write("bulkRenamed           : {}\n".format())
-        resultLOG.write("fineModel           : {}\n".format())
+        resultLOG.write("noisePatch             : {}\n".format(noisePatch))
+        resultLOG.write("loadGenerator          : {}\n".format(loadGenerator))
+        resultLOG.write("synNoise               : {}\n".format(synNoise))
+        resultLOG.write("fragmentNoisy          : {}\n".format(fragmentNoisy))
+        resultLOG.write("fragmentClean          : {}\n".format(fragmentClean))
+        resultLOG.write("noiseReweight          : {}\n".format(noiseReweight))
+        resultLOG.write("bulkRenamed            : {}\n".format(bulkRenamed))
+        resultLOG.write("fineModel              : {}\n".format(fineModel))
         resultLOG.write("\n\n")
         resultLOG.write("DEBUGGING PARAMETERS ==========================\n")
         resultLOG.write("extractDraw            : {}\n".format(extractDraw))
-        resultLOG.write("synGrid           : {}\n".format())
-        resultLOG.write("trainGrid           : {}\n".format())
+        resultLOG.write("synGrid                : {}\n".format(synGrid))
+        resultLOG.write("trainGrid              : {}\n".format(trainGrid))
         resultLOG.write("\n\n")
+    print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
 
 if __name__ == '__main__':
     args = parse_args_standard()
