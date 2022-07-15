@@ -52,7 +52,7 @@ def is_noise(arr,x0,x1,y0,y1):
     # print('True :: std_global: {} | std_1: {} | std_2: {} | std_3: {} | std_4: {} '.format(std_global,std_1,std_2,std_3,std_4))
     return isnoise
 
-def parse_args_noiseExtract():
+def parse_args_extract():
     parser = argparse.ArgumentParser(description="Noise extraction based on coarse denoised samples.")
 
     # directories
@@ -63,9 +63,11 @@ def parse_args_noiseExtract():
     
     parser.add_argument('--worker',     type=int, default=1, help='number of workers')
     parser.add_argument('-s', '--size', type=int, default=512, help='extraction size')
+
+    parser.add_argument('-n', '--num',  type=int, default=10000, help='number of patches to be extracted(random, randgauss workflow).')
     return parser.parse_args()
 
-args = parse_args_noiseExtract()
+args = parse_args_extract()
 denoised_dir    = args.denoised
 raw_dir         = args.raw
 noisePatchDIR   = args.noisePatch
@@ -165,7 +167,7 @@ def mainTask(*input_list):
 def mainTaskReport(*input_list):
     processInputsReport(list(input_list))
 
-def main():
+if __name__ == "__main__":
     if worker > 1: # Multithreading
         threads = []
         for i in range(worker-1):
@@ -173,7 +175,7 @@ def main():
             T = multiprocessing.Process(target=mainTask, args=(input_list[jobsNUM * i : jobsNUM * (i+1)]))
             threads.append(T)
         print("worker ", i+1, " will process ", jobsNUM * (i+1) , " ~ " , len(input_list)-1)
-        T = multiprocessing.Process(target=mainTask, args=(input_list[jobsNUM * (i+1) : ]))
+        T = multiprocessing.Process(target=mainTaskReport, args=(input_list[jobsNUM * (i+1) : ]))
         threads.append(T)
 
         for t in threads:
@@ -189,6 +191,3 @@ def main():
     else:
         print("Worker should be >= 1.")
         assert False
-
-if __name__ == "__main__":
-    main()

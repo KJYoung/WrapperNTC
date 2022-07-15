@@ -15,15 +15,20 @@ def parse_args_standard():
     parser.add_argument('--clean', required=True, help='path to clean dataset.')
     parser.add_argument('--raw', required=True, help='path to raw micrographs dataset.')
     parser.add_argument('-d', '--device', default=0, type=int, help='which device to use, set to -1 to force CPU (default: 0).')
-    parser.add_argument('--coarseEpochs', default=100, type=int, help='coarse denoiser training epochs (default: 100).')
     parser.add_argument('--extractCores', default=2, type=int, help='number of CPU cores to use for noise extract (default: 2).')
-    parser.add_argument('--generator_iters', type=int, default=10000, help='The number of iterations for generator in WGAN model (default: 10000)')
+    parser.add_argument('--generator_iters', type=int, default=10000, help='The number of iterations for generator in WGAN model (default: 10,000)')
     parser.add_argument('--synNum64', type=int, default=320, help='number of noise synthesize. [synNum64 * 64] patches would be generated (default: 320).')
     parser.add_argument('--augNum', type=int, default=2, help='number of noise reweighting augmentation. [augNum] patches would be generated (default: 2).')
     parser.add_argument('--fineEpochs', default=400, type=int, help='fine denoiser training epochs (default: 400).')
     parser.add_argument('--fineBatch', default=4, type=int, help='fine denoiser training batch size (default: 4).')
     parser.add_argument('--fineLR', default=0.002, type=float, help='fine denoiser training learning rate (* default: 0.002 *).')
     
+    # for standard.
+    parser.add_argument('--coarseEpochs', default=100, type=int, help='coarse denoiser training epochs (default: 100).')
+    # for random, randgauss.
+    parser.add_argument('--randomPatchNum', default=10000, type=int, help='total number of extraction from raw micrographs(default: 10,000).')
+    # for randgauss.
+    parser.add_argument('--stdMultGauss', default=10.0, type=float, help='multiplication factor to clean images\' std(default: 10.0).')
     # Bypass Options.
     parser.add_argument('--coarseModel', default='', type=str, help='already trained coarse denoiser model path to skip step 1.')
     parser.add_argument('--coarseDenoised', default='', type=str, help='already coarse denoised inputs path to skip step 1~2.')
@@ -86,6 +91,20 @@ def check_args(args):
         print('fineLR must be >= 0.0001')
         quit()
 
+    # --randomPatchNum
+    try:
+        assert args.randomPatchNum >= 100
+    except:
+        print('randomPatchNum must be >= 100')
+        quit()
+    
+    # --stdMultGauss
+    try:
+        assert args.stdMultGauss >= 0.0
+    except:
+        print('stdMultGauss must be >= 0.0')
+        quit()
+
     # --nt2c_dir
     if not os.path.exists(args.nt2cDir):
         print('NT2C directory does not exist!')
@@ -111,7 +130,7 @@ def check_args(args):
         args.clean = args.clean + '/'
     
     # --noisy
-    if not os.path.exists(args.noisy):
+    if (not os.path.exists(args.noisy)) and (args.workflow != 'randgauss'):
         print('Noisy data directory does not exist!')
         quit()
     if not args.noisy.endswith('/'):

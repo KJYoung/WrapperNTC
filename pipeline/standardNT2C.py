@@ -10,7 +10,7 @@ def step1CoarseTrain():
         print("----Step 1 was not successfully finished with error code {}".format(status1))
         quit()
 
-def step2CoraseDenoise():
+def step2CoraseDenoise(skipStep1):
     if not os.path.exists(coarseDenoisedDIR):   # directory for coarse denoised Raw micrographs.
         os.makedirs(coarseDenoisedDIR)
     
@@ -109,7 +109,7 @@ def step7BulkrenameFinetrain():
         print("----Step 7-2 : Fine denoiser training was not successfully finished with error code {}".format(status7_2))
         quit()
 
-def step8FineDenoise():
+def step8FineDenoise(skipStep7):
     if not os.path.exists(fineDenoisedDIR):   # directory for fine denoised Raw micrographs.
         os.makedirs(fineDenoisedDIR)
         
@@ -123,6 +123,29 @@ def step8FineDenoise():
         print("----Step 8 was not successfully finished with error code {}".format(status8))
         quit()
 
+def randomExtract():
+    if not os.path.exists(noisePatchDIR):       # directory for extracted noise patches.
+        os.makedirs(noisePatchDIR)
+    if extractDraw:
+        if not os.path.exists(noiseDrawDIR):    # directory for visualization of extraction.
+            os.makedirs(noiseDrawDIR)
+
+    noiseDrawOption = '' if extractDraw == False else f'--noiseDraw {noiseDrawDIR}'
+    statusRE = os.system(f'python {NT2CDIR}script/randomExtract.py --denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 -n {randomPatchNum} 2> {workspaceDIR}noiseExtractSTDERR.log')
+    if statusRE != 0:
+        print("----Random Extract was not successfully finished with error code {}".format(statusRE))
+        quit()
+
+def gaussApplication():
+    if not os.path.exists(noisyDIR):       # directory for gaussian noisy patches.
+        os.makedirs(noisyDIR)
+
+    noiseDrawOption = '' if extractDraw == False else f'--noiseDraw {noiseDrawDIR}'
+    statusGA = os.system(f'python {NT2CDIR}workUtil/gaussApplier.py -i {cleanDIR} -o {noisyDIR} -a {augNum} --std {stdMultGauss}')
+    if statusGA != 0:
+        print("----Gauss Application was not successfully finished with error code {}".format(statusGA))
+        quit()
+
 def summaryWriter(step1, step2, step3, step4, step5, step6, step7, step8):
     with open(f"{workspaceDIR}summary.txt", "w") as resultLOG:
         resultLOG.write("WORKFLOW : {}\n".format(workflow))
@@ -132,9 +155,11 @@ def summaryWriter(step1, step2, step3, step4, step5, step6, step7, step8):
         resultLOG.write("Elapsed time for step3 : {}\n".format(step4 - step3))
         resultLOG.write("Elapsed time for step4 : {}\n".format(step5 - step4))
         resultLOG.write("Elapsed time for step5 : {}\n".format(step6 - step5))
-        resultLOG.write("Elapsed time for step6 : {}\n".format(step7 - step6))
-        resultLOG.write("Elapsed time for step7 : {}\n".format(step8 - step7))
-        resultLOG.write("Elapsed time for step8 : {}\n".format(time.time() - step8))
+        if step7:
+            resultLOG.write("Elapsed time for step6 : {}\n".format(step7 - step6))
+        if step8:
+            resultLOG.write("Elapsed time for step7 : {}\n".format(step8 - step7))
+            resultLOG.write("Elapsed time for step8 : {}\n".format(time.time() - step8))
         resultLOG.write("Total Elapsed time     : {}\n".format(time.time() - pipelineStartTime))
         resultLOG.write("\n\n")
         resultLOG.write("---------- SUMMARY 2 : parameters statistics ---------------------------------------------\n")
@@ -172,7 +197,6 @@ def summaryWriter(step1, step2, step3, step4, step5, step6, step7, step8):
         resultLOG.write("trainGrid              : {}\n".format(trainGrid))
         resultLOG.write("\n\n")
 
-
 def standardWorkflow():
     skipStep1           = False if (coarseModel == '') and (coarseDenoised == '') and (noisePatch == '') and (fineModel == '') else True
     skipStep2           = False if (coarseDenoised == '') and (noisePatch == '') and (fineModel == '') else True
@@ -195,7 +219,7 @@ def standardWorkflow():
     if skipStep2:
         print("---- Step 2 skipped.")
     else:
-        step2CoraseDenoise()
+        step2CoraseDenoise(skipStep1)
         print("----Elapsed time for step 2 : {} seconds".format(time.time() - step2StartTime))
     # 3. Noise extract. #####################################################################################################################
     print("--Step 3 : Noise extraction! -------------------------------------------------------")
@@ -243,160 +267,71 @@ def standardWorkflow():
     # 8. Fine denoise raw micrographs. ######################################################################################################
     print("--Step 8 : Fine denoise raw micrographs! -----------------------------------------")
     step8StartTime      = time.time()
-    step8FineDenoise()
+    step8FineDenoise(skipStep7)
     print("----Elapsed time for step 8 : {} seconds".format(time.time() - step8StartTime))
     
     summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, step7StartTime, step8StartTime)
     print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
-def randomWorkflow():
-    skipStep1           = False if (coarseModel == '') and (coarseDenoised == '') and (noisePatch == '') and (fineModel == '') else True
-    skipStep2           = False if (coarseDenoised == '') and (noisePatch == '') and (fineModel == '') else True
-    skipStep3           = False if (noisePatch == '') and (fineModel == '') else True
-    skipStep4           = False if (loadGenerator == '') and (synNoise == '') and (fineModel == '') else True
-    skipStep5           = False if (synNoise == '') and (fineModel == '') else True
-    skipStep6           = False if (fineModel == '') else True
-    skipStep7           = False if (fineModel == '') else True
+def randomWorkflow(withGaussain=False):
+    skipStep1           = False if (noisePatch == '') and (fineModel == '') else True
+    skipStep2           = False if (loadGenerator == '') and (synNoise == '') and (fineModel == '') else True
+    skipStep3           = False if (synNoise == '') and (fineModel == '') else True
+    skipStep4           = False if (fineModel == '') else True
+    skipStep5           = False if (fineModel == '') else True
     # 1. Coarse Denoiser Training. ##########################################################################################################
-    print("--Step 1 : Coarse Denoiser Training! -----------------------------------------------")
+    print("--Step 1 : Random extraction! -------------------------------------------------------")
     step1StartTime      = time.time()
     if skipStep1:
         print("---- Step 1 skipped.")
     else:
-        step1CoarseTrain()
+        randomExtract()
         print("----Elapsed time for step 1 : {} seconds".format(time.time() - step1StartTime))
-    # 2. Coarse Denoise Raw Micrographs. ####################################################################################################
-    print("--Step 2 : Coarse Denoising! -------------------------------------------------------")
+    
+    # 2. GAN noise synthesizer training. ####################################################################################################
+    print("--Step 2 : GAN noise synthesizer training! -----------------------------------------")
     step2StartTime      = time.time()
     if skipStep2:
         print("---- Step 2 skipped.")
     else:
-        step2CoraseDenoise()
+        step4GANtrain()
         print("----Elapsed time for step 2 : {} seconds".format(time.time() - step2StartTime))
-    # 3. Noise extract. #####################################################################################################################
-    print("--Step 3 : Noise extraction! -------------------------------------------------------")
+
+    # 3. GAN noise synthesize. ##############################################################################################################
+    print("--Step 3 : Noise synthesize! -------------------------------------------------------")
     step3StartTime      = time.time()
     if skipStep3:
         print("---- Step 3 skipped.")
     else:
-        step3NoiseExtract()
-        print("----Elapsed time for step 3 : {} seconds".format(time.time() - step3StartTime))
-    # 4. GAN noise synthesizer training. ####################################################################################################
-    print("--Step 4 : GAN noise synthesizer training! -----------------------------------------")
-    step4StartTime      = time.time()
-    if skipStep4:
-        print("---- Step 4 skipped.")
-    else:
-        step4GANtrain()
-        print("----Elapsed time for step 4 : {} seconds".format(time.time() - step4StartTime))
-
-    # 5. GAN noise synthesize. ##############################################################################################################
-    print("--Step 5 : Noise synthesize! -------------------------------------------------------")
-    step5StartTime      = time.time()
-    if skipStep5:
-        print("---- Step 5 skipped.")
-    else:
         step5GANsynthesize()
-        print("----Elapsed time for step 5 : {} seconds".format(time.time() - step5StartTime))
-    # 6. Fragment then Noise reweighting. ###################################################################################################
-    print("--Step 6 : Fragment then Noise reweighting! -----------------------------------------")
-    step6StartTime      = time.time()
+        print("----Elapsed time for step 3 : {} seconds".format(time.time() - step3StartTime))
+    
+    # 4. Fragment then Noise reweighting. ###################################################################################################
+    print("--Step 4 : Fragment then Noise reweighting! -----------------------------------------")
+    step4StartTime      = time.time()
 
-    if skipStep6:
-        print('---- Step 6 skipped.')
+    if skipStep4:
+        print('---- Step 4 skipped.')
     else:
+        if withGaussain:
+            gaussApplication()
         step6FragmentReweight()
-        print("----Elapsed time for step 6 : {} seconds".format(time.time() - step6StartTime))
-    # 7. Bulk rename and Fine Denoiser training. ############################################################################################
-    print("--Step 7 : Bulk rename and Fine Denoiser training! -----------------------------------------")
-    step7StartTime      = time.time()
+        print("----Elapsed time for step 4 : {} seconds".format(time.time() - step4StartTime))
+    # 5. Bulk rename and Fine Denoiser training. ############################################################################################
+    print("--Step 5 : Bulk rename and Fine Denoiser training! -----------------------------------------")
+    step5StartTime      = time.time()
 
-    if skipStep7:
-        print('---- Step 7 skipped.')
+    if skipStep5:
+        print('---- Step 5 skipped.')
     else:
         step7BulkrenameFinetrain()
-        print("----Elapsed time for step 7 : {} seconds".format(time.time() - step7StartTime))
-    # 8. Fine denoise raw micrographs. ######################################################################################################
-    print("--Step 8 : Fine denoise raw micrographs! -----------------------------------------")
-    step8StartTime      = time.time()
-    step8FineDenoise()
-    print("----Elapsed time for step 8 : {} seconds".format(time.time() - step8StartTime))
-    
-    summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, step7StartTime, step8StartTime)
-    print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
-def randgaussWorkflow():
-    skipStep1           = False if (coarseModel == '') and (coarseDenoised == '') and (noisePatch == '') and (fineModel == '') else True
-    skipStep2           = False if (coarseDenoised == '') and (noisePatch == '') and (fineModel == '') else True
-    skipStep3           = False if (noisePatch == '') and (fineModel == '') else True
-    skipStep4           = False if (loadGenerator == '') and (synNoise == '') and (fineModel == '') else True
-    skipStep5           = False if (synNoise == '') and (fineModel == '') else True
-    skipStep6           = False if (fineModel == '') else True
-    skipStep7           = False if (fineModel == '') else True
-    # 1. Coarse Denoiser Training. ##########################################################################################################
-    print("--Step 1 : Coarse Denoiser Training! -----------------------------------------------")
-    step1StartTime      = time.time()
-    if skipStep1:
-        print("---- Step 1 skipped.")
-    else:
-        step1CoarseTrain()
-        print("----Elapsed time for step 1 : {} seconds".format(time.time() - step1StartTime))
-    # 2. Coarse Denoise Raw Micrographs. ####################################################################################################
-    print("--Step 2 : Coarse Denoising! -------------------------------------------------------")
-    step2StartTime      = time.time()
-    if skipStep2:
-        print("---- Step 2 skipped.")
-    else:
-        step2CoraseDenoise()
-        print("----Elapsed time for step 2 : {} seconds".format(time.time() - step2StartTime))
-    # 3. Noise extract. #####################################################################################################################
-    print("--Step 3 : Noise extraction! -------------------------------------------------------")
-    step3StartTime      = time.time()
-    if skipStep3:
-        print("---- Step 3 skipped.")
-    else:
-        step3NoiseExtract()
-        print("----Elapsed time for step 3 : {} seconds".format(time.time() - step3StartTime))
-    # 4. GAN noise synthesizer training. ####################################################################################################
-    print("--Step 4 : GAN noise synthesizer training! -----------------------------------------")
-    step4StartTime      = time.time()
-    if skipStep4:
-        print("---- Step 4 skipped.")
-    else:
-        step4GANtrain()
-        print("----Elapsed time for step 4 : {} seconds".format(time.time() - step4StartTime))
-
-    # 5. GAN noise synthesize. ##############################################################################################################
-    print("--Step 5 : Noise synthesize! -------------------------------------------------------")
-    step5StartTime      = time.time()
-    if skipStep5:
-        print("---- Step 5 skipped.")
-    else:
-        step5GANsynthesize()
         print("----Elapsed time for step 5 : {} seconds".format(time.time() - step5StartTime))
-    # 6. Fragment then Noise reweighting. ###################################################################################################
-    print("--Step 6 : Fragment then Noise reweighting! -----------------------------------------")
+    # 6. Fine denoise raw micrographs. ######################################################################################################
+    print("--Step 6 : Fine denoise raw micrographs! -----------------------------------------")
     step6StartTime      = time.time()
-
-    if skipStep6:
-        print('---- Step 6 skipped.')
-    else:
-        step6FragmentReweight()
-        print("----Elapsed time for step 6 : {} seconds".format(time.time() - step6StartTime))
-    # 7. Bulk rename and Fine Denoiser training. ############################################################################################
-    print("--Step 7 : Bulk rename and Fine Denoiser training! -----------------------------------------")
-    step7StartTime      = time.time()
-
-    if skipStep7:
-        print('---- Step 7 skipped.')
-    else:
-        step7BulkrenameFinetrain()
-        print("----Elapsed time for step 7 : {} seconds".format(time.time() - step7StartTime))
-    # 8. Fine denoise raw micrographs. ######################################################################################################
-    print("--Step 8 : Fine denoise raw micrographs! -----------------------------------------")
-    step8StartTime      = time.time()
-    step8FineDenoise()
-    print("----Elapsed time for step 8 : {} seconds".format(time.time() - step8StartTime))
+    step8FineDenoise(skipStep5)
+    print("----Elapsed time for step 6 : {} seconds".format(time.time() - step6StartTime))
     
-    summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, step7StartTime, step8StartTime)
+    summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, None, None)
     print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
 
 if __name__ == '__main__':
@@ -434,6 +369,8 @@ if __name__ == '__main__':
     fineBatch           = args.fineBatch
     fineLR              = args.fineLR
 
+    randomPatchNum      = args.randomPatchNum
+    stdMultGauss        = args.stdMultGauss
     # 2. Directory, path.
     coarseSavePrefix    = workspaceDIR + 'coarseModel/' + 'model'
     coarseModelDIR      = workspaceDIR + 'coarseModel/'
@@ -455,6 +392,6 @@ if __name__ == '__main__':
     elif workflow == 'random':
         randomWorkflow()
     elif workflow == 'randgauss':
-        randgaussWorkflow()
+        randomWorkflow(withGaussain = True)
     else:
         print("ERROR : There is no {} workflow".format(workflow))

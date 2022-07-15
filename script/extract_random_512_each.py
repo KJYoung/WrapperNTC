@@ -9,6 +9,7 @@ import sys,os
 import matplotlib.pyplot as plt
 import pywt
 import multiprocessing
+import time 
 
 raw_dir         = sys.argv[1]       # raw micrographs directory.
 noise_dir       = sys.argv[2]       # result noise patches directory.
@@ -18,24 +19,13 @@ worker          = int(sys.argv[5])  # number of workers.
 targetNum       = int(sys.argv[6])  # target number of result patches.
 
 box_size=512
-par_size=200
 step=int(0.02*box_size) 
 noise_patch_num=0
 input_list=os.listdir(raw_dir)
 
 jobNumList     =  np.full(worker, targetNum//worker)
 jobNumList[-1] += targetNum - np.sum(jobNumList)
-import time 
 script_start = time.time()
-
-# Multi processing!
-print('box_size : {}, step:  {}'.format(box_size, step))
-print(raw_dir)
-print(noise_dir)
-print(draw_dir)
-print(worker)
-print(targetNum)
-print("input length :", len(input_list))
 
 jobsNUM = len(input_list) // worker
 
@@ -90,10 +80,9 @@ def processInputs(id, input_list):
         file_n += 1
 
 def print_sum(*input_list):
-    print("Input length : " , len(input_list[1]), time.ctime(), "in thread ", input_list[0])
     processInputs(input_list[0], input_list[1])
 
-def main():
+if __name__ == "__main__":
     threads = []
     for i in range(worker-1):
         print("worker ", i, " will process ", jobsNUM * i , " ~ " , jobsNUM * (i+1) - 1)
@@ -108,13 +97,6 @@ def main():
 
     for process in multiprocessing.active_children():
         process.join()
-        print(process.name, process.pid, process.is_alive())
 
     for process in multiprocessing.active_children():
         print(process.name, process.is_alive())
-
-if __name__ == "__main__":
-    # pass
-    main()
-
-print("---------------- extract_noise job is end ----------------")

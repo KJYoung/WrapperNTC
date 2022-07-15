@@ -1,5 +1,5 @@
 import argparse
-import os
+import os,sys
 import numpy as np
 import mrcfile
 from os.path import exists
