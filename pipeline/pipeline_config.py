@@ -5,6 +5,9 @@ import os
 def parse_args_standard():
     parser = argparse.ArgumentParser(description="Improved Wrapper of NoiseTransfer2Clean.")
     
+    # Workflow selection
+    parser.add_argument('-w', '--workflow', choices=['standard', 'random', 'randgauss'], default='standard', help='choose the workflow (default: standard).')
+
     # Basic Parameters
     parser.add_argument('--nt2cDir', required=True, help='path to nt2c.')
     parser.add_argument('--workspace', required=True, help='path to save all the outputs.')
