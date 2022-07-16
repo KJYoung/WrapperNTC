@@ -200,7 +200,7 @@ def summaryWriter(step1, step2, step3, step4, step5, step6, step7, step8):
 def standardWorkflow():
     skipStep1           = False if (coarseModel == '') and (coarseDenoised == '') and (noisePatch == '') and (fineModel == '') else True
     skipStep2           = False if (coarseDenoised == '') and (noisePatch == '') and (fineModel == '') else True
-    skipStep3           = False if (noisePatch == '') and (fineModel == '') else True
+    skipStep3           = False if (noisePatch == '') and (synNoise == '') and (fineModel == '') else True
     skipStep4           = False if (loadGenerator == '') and (synNoise == '') and (fineModel == '') else True
     skipStep5           = False if (synNoise == '') and (fineModel == '') else True
     skipStep6           = False if (fineModel == '') else True
@@ -273,7 +273,7 @@ def standardWorkflow():
     summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, step7StartTime, step8StartTime)
     print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
 def randomWorkflow(withGaussain=False):
-    skipStep1           = False if (noisePatch == '') and (fineModel == '') else True
+    skipStep1           = False if (noisePatch == '') and (synNoise == '') and (fineModel == '') else True
     skipStep2           = False if (loadGenerator == '') and (synNoise == '') and (fineModel == '') else True
     skipStep3           = False if (synNoise == '') and (fineModel == '') else True
     skipStep4           = False if (fineModel == '') else True
