@@ -141,7 +141,7 @@ def gaussApplication():
         os.makedirs(noisyDIR)
 
     noiseDrawOption = '' if extractDraw == False else f'--noiseDraw {noiseDrawDIR}'
-    statusGA = os.system(f'python {NT2CDIR}workUtil/gaussApplier.py -i {cleanDIR} -o {noisyDIR} -a {augNum} --std {stdMultGauss}')
+    statusGA = os.system(f'python {NT2CDIR}workUtil/gaussApplier.py -i {cleanDIR} -o {noisyDIR} -a 1 --std {stdMultGauss}')
     if statusGA != 0:
         print("----Gauss Application was not successfully finished with error code {}".format(statusGA))
         quit()
@@ -312,7 +312,7 @@ def randomWorkflow(withGaussain=False):
     if skipStep4:
         print('---- Step 4 skipped.')
     else:
-        if withGaussain:
+        if withGaussain and (not skipGauss):
             gaussApplication()
         step6FragmentReweight()
         print("----Elapsed time for step 4 : {} seconds".format(time.time() - step4StartTime))
@@ -369,6 +369,7 @@ if __name__ == '__main__':
     fineBatch           = args.fineBatch
     fineLR              = args.fineLR
 
+    skipGauss           = args.skipGauss
     randomPatchNum      = args.randomPatchNum
     stdMultGauss        = args.stdMultGauss
     # 2. Directory, path.

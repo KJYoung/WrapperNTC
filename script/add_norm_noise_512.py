@@ -61,9 +61,21 @@ for i, clean_img in enumerate(clean_list):
         clean=clean.data
         noisy=noisy.data
         noise=noise.data
-        clean=(clean-np.min(clean))/(np.max(clean)-np.min(clean))*255.0
-        noisy=(noisy-np.min(noisy))/(np.max(noisy)-np.min(noisy))*255.0
-        noise=(noise-np.min(noise))/(np.max(noise)-np.min(noise))*255.0
+        
+        # print(f"file : {clean_path} clean : {np.min(clean)}, {np.max(clean)}, {np.max(clean) - np.min(clean)}")
+        if (np.max(clean)-np.min(clean)) != 0.0:
+            clean=(clean-np.min(clean))/(np.max(clean)-np.min(clean))*255.0
+        else:
+            clean=(clean-np.min(clean))*255.0
+        if (np.max(noisy)-np.min(noisy)) != 0.0:
+            noisy=(noisy-np.min(noisy))/(np.max(noisy)-np.min(noisy))*255.0
+        else:
+            noisy=(noisy-np.min(noisy))*255.0
+        if (np.max(noise)-np.min(noise)) != 0.0:
+            noise=(noise-np.min(noise))/(np.max(noise)-np.min(noise))*255.0
+        else:
+            noise=(noise-np.min(noise))*255.0
+            
         k1,k2,b=fit_noise(clean,noise,noisy)
         # print('k1,k2,b: {}, {}, {}'.format(k1,k2,b))
         noisy_gen=k1*clean+k2*(noise-np.mean(noise))+b+(noise-np.mean(noise))
