@@ -50,7 +50,6 @@ for i, clean_img in enumerate(clean_list):
     for reIndex in range(augNum): # 16000 * 2 = 32000
         rand1=random.randint(0,noise_len-1)
         # print(noisy_gen_dir+clean_img[:-4]+"_{}".format(reIndex)+".mrc" + " | with noise {}".format(rand1))
-        # rand1=0 # Fix for merge. ##################################################
         clean_path=os.path.join(clean_dir,clean_img)
         noisy_path=os.path.join(noisy_dir,clean_img)
         noise_path=os.path.join(noise_dir,noise_list[rand1])
@@ -85,6 +84,3 @@ for i, clean_img in enumerate(clean_list):
         fit_noisy_out.set_data(noisy_gen.astype(np.float32))
         
     print('# Noise reweighting : [{}/{}] {:.2%}'.format(i, len(clean_list), i/len(clean_list)), file=sys.stderr, end='\r')
-
-# python3 add_norm_noise_320.py /cdata/temp/clean/ /cdata/NT2C/noise_synthesizer/pytorch-wgan-master/synthesized_noises/ /cdata/temp/noisy/  /cdata/temp/reweighted/
-# python3 add_norm_noise_512.py /cdata/db1/fragmentTEM/clean4/ /cdata/NT2C/noise_synthesizer/pytorch-wgan-master/synthesized_noises/ /cdata/db1/fragmentTEM/noisy4/  /cdata/db1/noiseReweight/

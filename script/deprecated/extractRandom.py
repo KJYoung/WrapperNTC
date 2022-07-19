@@ -17,6 +17,7 @@ draw_dir        = sys.argv[3]       # (debug) draw noise
 denoised_dir    = sys.argv[4]       # (debug) denoised micrographs
 worker          = int(sys.argv[5])  # number of workers.
 targetNum       = int(sys.argv[6])  # target number of result patches.
+box_size        = int(sys.argv[7])  # random extract patch size.
 
 box_size=512
 step=int(0.02*box_size) 
@@ -30,7 +31,7 @@ script_start = time.time()
 jobsNUM = len(input_list) // worker
 
 assert targetNum == np.sum(jobNumList)
-
+assert box_size  >  256                # At least, box_size should > 256
     
 def processInputs(id, input_list):
     noise_patch_n = 0

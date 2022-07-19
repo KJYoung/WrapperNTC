@@ -88,7 +88,7 @@ def step6FragmentReweight():
     if noiseReweight == '': # Noise reweight
         if not os.path.exists(noiseReweightDIR):
             os.makedirs(noiseReweightDIR)
-        status6_3 = os.system(f'python {NT2CDIR}script/add_norm_noise_512.py {fragmentCleanDIR} {synNoiseDIR} {fragmentNoisyDIR} {noiseReweightDIR} {augNum}')
+        status6_3 = os.system(f'python {NT2CDIR}script/noise_reweight.py {fragmentCleanDIR} {synNoiseDIR} {fragmentNoisyDIR} {noiseReweightDIR} {augNum}')
         if status6_3 != 0:
             print("----Step 6-3 : Noise reweighting was not successfully finished with error code {}".format(status6_3))
             quit()
