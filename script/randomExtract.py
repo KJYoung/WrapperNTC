@@ -79,7 +79,7 @@ def processInputs(id, input_list):
             y = np.random.randint(0, h-extractSize)
             assert x+extractSize<=w or y+extractSize<=h
             
-            raw_arr=raw_img[x:x+extractSize, y:y+extractSize]
+            raw_arr=raw_img[x:x+extractSize, y:y+extractSize].astype('float32')
             with mrcfile.new(noise_patch_path[:-4]+'_'+str(patch_n)+'.mrc',overwrite=True) as noise_patch:
                 noise_patch.set_data(raw_arr)
             if extractDraw: # draw noise patch location.
@@ -109,6 +109,7 @@ def processInputsReport(id, input_list):
         raw_img=raw_img.data
         raw_img=(raw_img-np.min(raw_img))/(np.max(raw_img)-np.min(raw_img))*255
         
+        # print(raw_img.shape)
         w,h=raw_img.shape
         noise_patch_path=os.path.join(noisePatchDIR,input_file)
         draw_noise_path=os.path.join(draw_dir,input_file)
@@ -121,7 +122,7 @@ def processInputsReport(id, input_list):
             y = np.random.randint(0, h-extractSize)
             assert x+extractSize<=w or y+extractSize<=h
             
-            raw_arr=raw_img[x:x+extractSize, y:y+extractSize]
+            raw_arr=raw_img[x:x+extractSize, y:y+extractSize].astype('float32')
             with mrcfile.new(noise_patch_path[:-4]+'_'+str(patch_n)+'.mrc',overwrite=True) as noise_patch:
                 noise_patch.set_data(raw_arr)
             if extractDraw: # draw noise patch location.
