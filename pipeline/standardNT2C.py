@@ -107,7 +107,8 @@ def step7BulkrenameFinetrain():
     status7_2 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -a {noiseReweightDIR} -b {bulkRenamedDIR} -d {cudaDevice} -c 512 --num-epochs {fineEpochs} --lr {fineLR} --batch-size {fineBatch} --save-prefix {fineSavePrefix} > {workspaceDIR}fineSTDOUT.log')
     if status7_2 != 0:
         print("----Step 7-2 : Fine denoiser training was not successfully finished with error code {}".format(status7_2))
-        quit()
+        return -1
+    return 0
 
 def step8FineDenoise(skipStep7):
     if not os.path.exists(fineDenoisedDIR):   # directory for fine denoised Raw micrographs.
@@ -157,6 +158,9 @@ def summaryWriter(step1, step2, step3, step4, step5, step6, step7, step8):
         resultLOG.write("Elapsed time for step5 : {}\n".format(step6 - step5))
         if step7:
             resultLOG.write("Elapsed time for step6 : {}\n".format(step7 - step6))
+        else:
+            resultLOG.write("Elapsed time for step6 : {}\n".format(time.time() - step6))
+
         if step8:
             resultLOG.write("Elapsed time for step7 : {}\n".format(step8 - step7))
             resultLOG.write("Elapsed time for step8 : {}\n".format(time.time() - step8))
@@ -262,14 +266,18 @@ def standardWorkflow():
     if skipStep7:
         print('---- Step 7 skipped.')
     else:
-        step7BulkrenameFinetrain()
+        retVal = step7BulkrenameFinetrain()
         print("----Elapsed time for step 7 : {} seconds".format(time.time() - step7StartTime))
-    # 8. Fine denoise raw micrographs. ######################################################################################################
-    print("--Step 8 : Fine denoise raw micrographs! -----------------------------------------")
-    step8StartTime      = time.time()
-    step8FineDenoise(skipStep7)
-    print("----Elapsed time for step 8 : {} seconds".format(time.time() - step8StartTime))
     
+    if retVal == 0:
+        # 8. Fine denoise raw micrographs. ######################################################################################################
+        print("--Step 8 : Fine denoise raw micrographs! -----------------------------------------")
+        step8StartTime      = time.time()
+        step8FineDenoise(skipStep7)
+        print("----Elapsed time for step 8 : {} seconds".format(time.time() - step8StartTime))
+    else:
+        print("--Step 8 was skipped due to the error during the step 7.")
+        step8StartTime      = time.time()
     summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, step7StartTime, step8StartTime)
     print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
 def randomWorkflow(withGaussain=False):
@@ -323,14 +331,18 @@ def randomWorkflow(withGaussain=False):
     if skipStep5:
         print('---- Step 5 skipped.')
     else:
-        step7BulkrenameFinetrain()
+        retVal = step7BulkrenameFinetrain()
         print("----Elapsed time for step 5 : {} seconds".format(time.time() - step5StartTime))
-    # 6. Fine denoise raw micrographs. ######################################################################################################
-    print("--Step 6 : Fine denoise raw micrographs! -----------------------------------------")
-    step6StartTime      = time.time()
-    step8FineDenoise(skipStep5)
-    print("----Elapsed time for step 6 : {} seconds".format(time.time() - step6StartTime))
     
+    if retVal == 0:
+        # 6. Fine denoise raw micrographs. ######################################################################################################
+        print("--Step 6 : Fine denoise raw micrographs! -----------------------------------------")
+        step6StartTime      = time.time()
+        step8FineDenoise(skipStep5)
+        print("----Elapsed time for step 6 : {} seconds".format(time.time() - step6StartTime))
+    else:
+        print("--Step 6 was skipped due to the error during the step 5.")
+        step6StartTime      = time.time()
     summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, None, None)
     print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
 
@@ -374,17 +386,19 @@ if __name__ == '__main__':
     stdMultGauss        = args.stdMultGauss
     # 2. Directory, path.
     coarseSavePrefix    = workspaceDIR + 'coarseModel/' + 'model'
+    fineSavePrefix      = workspaceDIR + 'fineModel/' + 'model'
+    
     coarseModelDIR      = workspaceDIR + 'coarseModel/'
-    coarseDenoisedDIR   = workspaceDIR + 'coarseDenoised/'
-    noisePatchDIR       = workspaceDIR + 'noisePatch/'
     noiseDrawDIR        = workspaceDIR + 'noiseDraw/'
+    
+    coarseDenoisedDIR   = (workspaceDIR + 'coarseDenoised/')         if coarseDenoised == '' else coarseDenoised
+    noisePatchDIR       = (workspaceDIR + 'noisePatch/')             if noisePatch == ''     else noisePatch
     generatorPath       = (workspaceDIR + 'generator.pkl')           if loadGenerator == ''  else loadGenerator
     fragmentNoisyDIR    = (workspaceDIR + 'fragmentNoisy/')          if fragmentNoisy == ''  else fragmentNoisy
     fragmentCleanDIR    = (workspaceDIR + 'fragmentClean/')          if fragmentClean == ''  else fragmentClean
     noiseReweightDIR    = (workspaceDIR + 'noiseReweight/')          if noiseReweight == ''  else noiseReweight
     synNoiseDIR         = (workspaceDIR + 'synthesized_noises/')     if synNoise == ''       else synNoise
     bulkRenamedDIR      = (workspaceDIR + 'fragmentPairedClean/')    if bulkRenamed == ''    else bulkRenamed
-    fineSavePrefix      = workspaceDIR + 'fineModel/' + 'model'
     fineModelDIR        = (workspaceDIR + 'fineModel/')
     fineDenoisedDIR     = (workspaceDIR + 'fineDenoised/')
 

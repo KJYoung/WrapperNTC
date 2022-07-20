@@ -5,4 +5,5 @@
 (2022/06/27) Lots of utils. Started 512x512 GAN training(including model adjustments).   
 (2022/06/30) After verification of the GAN performance.   
 (2022/07/12) After verification of RANDOM, RandGauss. Clean Repository.   
-()      
+(2022/07/21) After verification of tomsimGaussV3. Clean. Reoranize. Integrate workflow.   
+()
