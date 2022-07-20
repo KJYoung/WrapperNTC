@@ -7,7 +7,6 @@ def main(args):
 
     # Load datasets to train and test loaders
     train_loader, test_loader = get_data_loader(args)
-    #feature_extraction = FeatureExtractionTest(train_loader, test_loader, args.cuda, args.batch_size)
 
     # Start model training
     if args.is_train == 'True':
@@ -21,5 +20,4 @@ def main(args):
 
 if __name__ == '__main__':
     args = parse_args()
-    print(args.cuda)
     main(args)
