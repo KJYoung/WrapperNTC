@@ -21,9 +21,6 @@ name = 'denoise'
 help = 'denoise micrographs with various denoising algorithms'
 
 def add_arguments(parser):
-
-    ## only describe the model
-    # set GPU and number of worker threads
     parser.add_argument('-d', '--device', default=0, type=int, help='which device to use, set to -1 to force CPU (default: 0)')
 
     parser.add_argument('micrographs', nargs='*', help='micrographs to denoise')
@@ -40,7 +37,6 @@ def add_arguments(parser):
 
     parser.add_argument('-a', '--dir-a', nargs='+', help='directory of training images part A[NOISY]')
     parser.add_argument('-b', '--dir-b', nargs='+', help='directory of training images part B[CLEAN]')
-    parser.add_argument('--hdf', help='path to HDF5 file containing training image stack as an alternative to dirA/dirB')
     parser.add_argument('--preload', action='store_true', help='preload micrographs into RAM')
     parser.add_argument('--holdout', type=float, default=0.1, help='fraction of training micrograph pairs to holdout for validation (default: 0.1)')
 
@@ -196,42 +192,36 @@ def main(args):
 
     cutoff = args.pixel_cutoff # pixel truncation limit
 
-    do_train = (args.dir_a is not None and args.dir_b is not None) or (args.hdf is not None)
+    do_train = (args.dir_a is not None and args.dir_b is not None)
     if do_train:
         preload = args.preload
         holdout = args.holdout # fraction of image pairs to holdout for validation
 
-        if args.hdf is None: #use dirA/dirB
-            crop = args.crop
-            dir_as = args.dir_a
-            dir_bs = args.dir_b
+        #use dirA/dirB
+        crop = args.crop
+        dir_as = args.dir_a
+        dir_bs = args.dir_b
 
-            dset_train = []
-            dset_val = []
+        dset_train = []
+        dset_val = []
 
-            for dir_a, dir_b in zip(dir_as, dir_bs): 
-                random = np.random.RandomState(44444)
-                dataset_train, dataset_val = make_paired_images_datasets(dir_a, dir_b, crop, random=random, holdout=holdout, preload=preload , cutoff=cutoff)
-                dset_train.append(dataset_train)
-                dset_val.append(dataset_val)
+        for dir_a, dir_b in zip(dir_as, dir_bs): 
+            random = np.random.RandomState(44444)
+            dataset_train, dataset_val = make_paired_images_datasets(dir_a, dir_b, crop, random=random, holdout=holdout, preload=preload , cutoff=cutoff)
+            dset_train.append(dataset_train)
+            dset_val.append(dataset_val)
 
-            dataset_train = dset_train[0]
-            for i in range(1, len(dset_train)):
-                dataset_train.x += dset_train[i].x
-                dataset_train.y += dset_train[i].y
+        dataset_train = dset_train[0]
+        for i in range(1, len(dset_train)):
+            dataset_train.x += dset_train[i].x
+            dataset_train.y += dset_train[i].y
 
-            dataset_val = dset_val[0]
-            for i in range(1, len(dset_val)):
-                dataset_val.x += dset_val[i].x
-                dataset_val.y += dset_val[i].y
+        dataset_val = dset_val[0]
+        for i in range(1, len(dset_val)):
+            dataset_val.x += dset_val[i].x
+            dataset_val.y += dset_val[i].y
 
-            shuffle = True
-        else: # make HDF datasets
-            dataset_train, dataset_val = make_hdf5_datasets(args.hdf, paired=True
-                                                           , cutoff=cutoff
-                                                           , holdout=holdout
-                                                           , preload=preload)
-            shuffle = preload
+        shuffle = True
 
         # initialize the model
         model = dn.UDenoiseNet()
@@ -288,9 +278,6 @@ def main(args):
                 model.cuda()
 
             models.append(model)
-
-    # using trained model
-    # denoise the images
 
     normalize = args.normalize
     if args.format_ == 'png' or args.format_ == 'jpg':
