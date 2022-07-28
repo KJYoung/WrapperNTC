@@ -57,6 +57,8 @@ def load_model(name):
 def denoise(model, x, patch_size=-1, padding=128):
 
     # check the patch plus padding size
+    # print(patch_size, padding)
+
     use_patch = False
     if patch_size > 0:
         s = patch_size + padding

@@ -1,5 +1,5 @@
 # from skimage.measure import compare_ssim as ssim
-from skimage.metrics import structural_similarity as ssim
+# from skimage.metrics import structural_similarity as ssim
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
@@ -87,7 +87,6 @@ jobsNUM = len(input_list) // worker
     
 def processInputs(input_list):
     for input_file in input_list:
-        file_start = time.time()
         denoised_img=mrcfile.open(os.path.join(denoised_dir,input_file),permissive=True)
         denoised_img=denoised_img.data
         denoised_img=(denoised_img-np.min(denoised_img))/(np.max(denoised_img)-np.min(denoised_img))*255
