@@ -85,10 +85,9 @@ def make_paired_images_datasets(dir_a, dir_b, crop, random=np.random, holdout=0.
     n = int(holdout*len(A))
     order = random.permutation(len(A))
 
-    A_train = []
-    A_val = []
-    B_train = []
-    B_val = []
+    A_train, A_val = [], []
+    B_train, B_val = [], []
+    
     for i in range(n):
         A_val.append(A[order[i]])
         B_val.append(B[order[i]])
@@ -146,8 +145,7 @@ def denoise_image(mic, models, lowpass=1, cutoff=0, gaus=None, inv_gaus=None, de
         mic = mic.cuda()
 
     # normalize and remove outliers
-    mu = mic.mean()
-    std = mic.std()
+    mu, std = mic.mean(), mic.std()
     x = (mic - mu)/std
     if cutoff > 0:
         x[(x < -cutoff) | (x > cutoff)] = 0
@@ -221,8 +219,6 @@ def main(args):
             dataset_val.x += dset_val[i].x
             dataset_val.y += dset_val[i].y
 
-        shuffle = True
-
         # initialize the model
         model = dn.UDenoiseNet()
         
@@ -246,7 +242,7 @@ def main(args):
                                         , batch_size=batch_size, criteria=criteria
                                         , num_epochs=num_epochs, dataset_val=dataset_val
                                         , use_cuda=use_cuda, num_workers=num_workers
-                                        , shuffle=shuffle
+                                        , shuffle=True
                                         )
 
         for epoch,loss_train,loss_val in iterator:
@@ -306,6 +302,7 @@ def main(args):
     deconv_patch = args.deconv_patch
 
     ps = args.patch_size
+    print("patch_size : ", ps)
     padding = args.patch_padding
 
     count = 0

@@ -47,6 +47,7 @@ def parse_args_standard():
     parser.add_argument('--extractDraw', dest='extractDraw', action='store_true', help='save noiseDraw during step 3 if this option is flagged.')
     parser.add_argument('--synGrid',     dest='synGrid',     action='store_true', help='save overview grid during step 5 if this option is flagged.')
     parser.add_argument('--trainGrid',   dest='trainGrid',   action='store_true', help='save overview grid during step 4 if this option is flagged.')
+    parser.add_argument('--untilExtract',dest='untilExtract',action='store_true', help='debug : quit after extraction.')
     return check_args(parser.parse_args())
 
 # Checking arguments

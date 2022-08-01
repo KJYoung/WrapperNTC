@@ -252,7 +252,7 @@ class WGAN_GP(object):
             
             # Saving model and sampling images every 1000th generator iterations
             if (g_iter) % SAVE_PER_TIMES == 0:
-                self.save_model()
+                self.save_model(g_iter)
 
                 if not os.path.exists(self.outputDir + 'training_result_images/'):
                     os.makedirs(self.outputDir + 'training_result_images/')
@@ -278,7 +278,7 @@ class WGAN_GP(object):
 
         print('Time of training-{}'.format((t.time() - self.t_begin)))
         # Save the trained parameters
-        self.save_model()
+        self.save_model(g_iter)
 
     def evaluate(self, test_loader, D_model_path, G_model_path):
         self.load_model(D_model_path, G_model_path)
@@ -367,9 +367,13 @@ class WGAN_GP(object):
     def to_np(self, x):
         return x.data.cpu().numpy()
 
-    def save_model(self):
+    def save_model(self, iterNum):
         torch.save(self.G.state_dict(), self.outputDir + 'generator.pkl')
         torch.save(self.D.state_dict(), self.outputDir + 'discriminator.pkl')
+
+        if iterNum % 5000 == 0:
+            torch.save(self.G.state_dict(), self.outputDir + f'generator_{iterNum}.pkl')
+            torch.save(self.D.state_dict(), self.outputDir + f'discriminator_{iterNum}.pkl')
         print('Models save to ./generator.pkl & ./discriminator.pkl ')
 
     def load_model(self, D_model_filename, G_model_filename):

@@ -17,6 +17,7 @@ srcDir = sys.argv[1]
 outDir = sys.argv[2] 
 paths = sorted(os.listdir(srcDir))
 paths = sorted(os.listdir(srcDir), key = lambda x: int(x[x.rindex('_')+1:-4]))
+# paths = sorted(os.listdir(srcDir), key = lambda x: int(x[x.rindex('_')+6:-4]))
 print(paths)
 paths = [os.path.join(srcDir,path) for path in paths]
 img2mp4(paths , outDir, fps=3)

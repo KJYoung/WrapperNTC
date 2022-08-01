@@ -233,6 +233,8 @@ def standardWorkflow():
     else:
         step3NoiseExtract()
         print("----Elapsed time for step 3 : {} seconds".format(time.time() - step3StartTime))
+    if untilExtract:
+        quit()
     # 4. GAN noise synthesizer training. ####################################################################################################
     print("--Step 4 : GAN noise synthesizer training! -----------------------------------------")
     step4StartTime      = time.time()
@@ -384,6 +386,7 @@ if __name__ == '__main__':
     skipGauss           = args.skipGauss
     randomPatchNum      = args.randomPatchNum
     stdMultGauss        = args.stdMultGauss
+    untilExtract        = args.untilExtract
     # 2. Directory, path.
     coarseSavePrefix    = workspaceDIR + 'coarseModel/' + 'model'
     fineSavePrefix      = workspaceDIR + 'fineModel/' + 'model'

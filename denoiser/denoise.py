@@ -55,7 +55,6 @@ def load_model(name):
 
 
 def denoise(model, x, patch_size=-1, padding=128):
-
     # check the patch plus padding size
     # print(patch_size, padding)
 
@@ -100,8 +99,6 @@ def denoise_patches(model, x, patch_size, padding=128):
                 y[i:i+patch_size,j:j+patch_size] = yij[si:si+patch_size,sj:sj+patch_size]
 
     return y
-
-  
 
 class DenoiseNet(nn.Module):
     def __init__(self, base_filters):
