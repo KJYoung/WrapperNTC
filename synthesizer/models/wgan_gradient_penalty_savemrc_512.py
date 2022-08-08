@@ -7,7 +7,6 @@ import time as t
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 import os
-from utils.tensorboard_logger import Logger
 from itertools import chain
 from torchvision import utils
 
@@ -146,9 +145,6 @@ class WGAN_GP(object):
         self.d_optimizer = optim.Adam(self.D.parameters(), lr=self.learning_rate, betas=(self.b1, self.b2))
         self.g_optimizer = optim.Adam(self.G.parameters(), lr=self.learning_rate, betas=(self.b1, self.b2))
 
-        # Set the logger
-        self.logger = Logger('./logs')
-        self.logger.writer.flush()
         self.number_of_images = 10
 
         self.generator_iters = args.generator_iters
@@ -371,7 +367,7 @@ class WGAN_GP(object):
         torch.save(self.G.state_dict(), self.outputDir + 'generator.pkl')
         torch.save(self.D.state_dict(), self.outputDir + 'discriminator.pkl')
 
-        if iterNum % 5000 == 0:
+        if iterNum % 5000 == 0 and iterNum != 0:
             torch.save(self.G.state_dict(), self.outputDir + f'generator_{iterNum}.pkl')
             torch.save(self.D.state_dict(), self.outputDir + f'discriminator_{iterNum}.pkl')
         print('Models save to ./generator.pkl & ./discriminator.pkl ')

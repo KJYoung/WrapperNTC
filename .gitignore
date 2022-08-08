@@ -8,3 +8,4 @@ reweigted/*
 noise_synthesizer/pytorch-wgan-master/synthesized_grid/*
 *.pyc
 pipeline/__pycache__/*.pyc
+topaz
