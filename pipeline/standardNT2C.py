@@ -3,7 +3,7 @@ import os, time
 import numpy as np
 
 def step1CoarseTrain():
-    if not os.path.exists(coarseModelDIR):      # directory for coarse Denoiser models.
+    if not os.path.exists(coarseModelDIR):      # directory for coarse denoiser models.
         os.makedirs(coarseModelDIR)
     status1 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -a {noisyDIR} -b {cleanDIR} -d {cudaDevice} -c 800 --num-epochs {coarseEpochs} --save-prefix {coarseSavePrefix} > {workspaceDIR}coarseSTDOUT.log')
     if status1 != 0:
@@ -19,7 +19,10 @@ def step2CoraseDenoise(skipStep1):
     else:
         digits = int(np.ceil(np.log10(coarseEpochs)))
         coarseModelPath = coarseSavePrefix + ('_epoch{:0'+str(digits)+'}.sav').format(coarseEpochs)
-    status2 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -o {coarseDenoisedDIR} -m {coarseModelPath} -d {cudaDevice} {rawDataDIR}*.mrc')
+    
+    patchSizeParam = "" if patchSize == -1 else f"-s {patchSize}"
+    status2 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -o {coarseDenoisedDIR} -m {coarseModelPath} -d {cudaDevice} {patchSizeParam} {rawDataDIR}*.mrc')
+    
     if status2 != 0:
         print("----Step 2 was not successfully finished with error code {}".format(status2))
         quit()
@@ -39,32 +42,23 @@ def step3NoiseExtract():
 
 def step4GANtrain():
     GANtrainDataDIR = (workspaceDIR + "noisePatch/") if noisePatch == "" else noisePatch
+    trainGridParam = "--synGrid" if trainGrid else ""
+    CUDA_ENV_Param = f"CUDA_VISIBLE_DEVICES={cudaDevice}" if cudaDevice >= 0 else ""
+    cudaParam      = "True" if cudaDevice >= 0 else "False"
 
-    if cudaDevice >= 0:
-        if trainGrid:
-            status4 = os.system(f'CUDA_VISIBLE_DEVICES={cudaDevice} python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda True --generator_iters {generatorIter} --output_dir {workspaceDIR} --synGrid > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
-        else:
-            status4 = os.system(f'CUDA_VISIBLE_DEVICES={cudaDevice} python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda True --generator_iters {generatorIter} --output_dir {workspaceDIR} > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
-    else:
-        if trainGrid:
-            status4 = os.system(f'python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda False --generator_iters {generatorIter} --output_dir {workspaceDIR} --synGrid > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
-        else:
-            status4 = os.system(f'python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda False --generator_iters {generatorIter} --output_dir {workspaceDIR} > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
+    status4 = os.system(f'{CUDA_ENV_Param} python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda {cudaParam} --generator_iters {generatorIter} --output_dir {workspaceDIR} {trainGridParam} > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
+        
     if status4 != 0:
         print("----Step 4 was not successfully finished with error code {}".format(status4))
         quit()
 
 def step5GANsynthesize():
-    if cudaDevice >= 0:
-        if synGrid:
-            status5 = os.system(f'CUDA_VISIBLE_DEVICES={cudaDevice} python {NT2CDIR}synthesizer/main_generateV_512.py --batch_size 64 --dataroot / --cuda True --output_dir {workspaceDIR} --load_G {generatorPath} --synNum64 {synNum64} --synGrid 2> /dev/null')
-        else:
-            status5 = os.system(f'CUDA_VISIBLE_DEVICES={cudaDevice} python {NT2CDIR}synthesizer/main_generateV_512.py --batch_size 64 --dataroot / --cuda True --output_dir {workspaceDIR} --load_G {generatorPath} --synNum64 {synNum64} 2> /dev/null')
-    else:
-        if synGrid:
-            status5 = os.system(f'python {NT2CDIR}synthesizer/main_generateV_512.py --batch_size 64 --dataroot / --cuda False --output_dir {workspaceDIR} --load_G {generatorPath} --synNum64 {synNum64} --synGrid 2> /dev/null')
-        else:
-            status5 = os.system(f'python {NT2CDIR}synthesizer/main_generateV_512.py --batch_size 64 --dataroot / --cuda False --output_dir {workspaceDIR} --load_G {generatorPath} --synNum64 {synNum64} 2> /dev/null')
+    synGridParam = "--synGrid" if synGrid else ""
+    CUDA_ENV_Param = f"CUDA_VISIBLE_DEVICES={cudaDevice}" if cudaDevice >= 0 else ""
+    cudaParam      = "True" if cudaDevice >= 0 else "False"
+
+    status5 = os.system(f'{CUDA_ENV_Param} python {NT2CDIR}synthesizer/main_generateV_512.py --batch_size 64 --dataroot / --cuda {cudaParam} --output_dir {workspaceDIR} --load_G {generatorPath} --synNum64 {synNum64} {synGridParam} 2> /dev/null')
+        
     if status5 != 0:
         print("----Step 5 was not successfully finished with error code {}".format(status5))
         quit()
@@ -77,6 +71,7 @@ def step6FragmentReweight():
         if status6_1 != 0:
             print("----Step 6-1 : Noisy Fragmentation was not successfully finished with error code {}".format(status6_1))
             quit()
+    
     if fragmentClean == '': # Fragment Clean
         if not os.path.exists(fragmentCleanDIR):       # directory for fragmented clean patches.
             os.makedirs(fragmentCleanDIR)
@@ -119,7 +114,10 @@ def step8FineDenoise(skipStep7):
     else:
         digits = int(np.ceil(np.log10(fineEpochs)))
         fineModelPath = fineSavePrefix + ('_epoch{:0'+str(digits)+'}.sav').format(fineEpochs)
-    status8 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -c 512 -o {fineDenoisedDIR} -m {fineModelPath} -d {cudaDevice} {rawDataDIR}*.mrc')
+    
+    patchSizeParam = "" if patchSize == -1 else f"-s {patchSize}"
+    status8 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -c 512 -o {fineDenoisedDIR} -m {fineModelPath} -d {cudaDevice} {patchSizeParam} {rawDataDIR}*.mrc')
+
     if status8 != 0:
         print("----Step 8 was not successfully finished with error code {}".format(status8))
         quit()
@@ -271,17 +269,21 @@ def standardWorkflow():
         retVal = step7BulkrenameFinetrain()
         print("----Elapsed time for step 7 : {} seconds".format(time.time() - step7StartTime))
     
-    if retVal == 0:
+    
+    step8StartTime = time.time()
+    if skipFineDenoise:
+        print('---- Step 8 skipped.')
+    elif retVal == 0:
         # 8. Fine denoise raw micrographs. ######################################################################################################
         print("--Step 8 : Fine denoise raw micrographs! -----------------------------------------")
-        step8StartTime      = time.time()
         step8FineDenoise(skipStep7)
         print("----Elapsed time for step 8 : {} seconds".format(time.time() - step8StartTime))
     else:
         print("--Step 8 was skipped due to the error during the step 7.")
-        step8StartTime      = time.time()
+    
     summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, step7StartTime, step8StartTime)
     print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
+
 def randomWorkflow(withGaussain=False):
     skipStep1           = False if (noisePatch == '') and (synNoise == '') and (fineModel == '') else True
     skipStep2           = False if (loadGenerator == '') and (synNoise == '') and (fineModel == '') else True
@@ -318,7 +320,6 @@ def randomWorkflow(withGaussain=False):
     # 4. Fragment then Noise reweighting. ###################################################################################################
     print("--Step 4 : Fragment then Noise reweighting! -----------------------------------------")
     step4StartTime      = time.time()
-
     if skipStep4:
         print('---- Step 4 skipped.')
     else:
@@ -329,22 +330,24 @@ def randomWorkflow(withGaussain=False):
     # 5. Bulk rename and Fine Denoiser training. ############################################################################################
     print("--Step 5 : Bulk rename and Fine Denoiser training! -----------------------------------------")
     step5StartTime      = time.time()
-
     if skipStep5:
         print('---- Step 5 skipped.')
     else:
         retVal = step7BulkrenameFinetrain()
         print("----Elapsed time for step 5 : {} seconds".format(time.time() - step5StartTime))
     
-    if retVal == 0:
+    
+    step6StartTime      = time.time()
+    if skipFineDenoise:
+        print('---- Step 6 skipped.')
+    elif retVal == 0:
         # 6. Fine denoise raw micrographs. ######################################################################################################
         print("--Step 6 : Fine denoise raw micrographs! -----------------------------------------")
-        step6StartTime      = time.time()
         step8FineDenoise(skipStep5)
         print("----Elapsed time for step 6 : {} seconds".format(time.time() - step6StartTime))
     else:
         print("--Step 6 was skipped due to the error during the step 5.")
-        step6StartTime      = time.time()
+    
     summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, None, None)
     print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
 
@@ -382,11 +385,14 @@ if __name__ == '__main__':
     fineEpochs          = args.fineEpochs
     fineBatch           = args.fineBatch
     fineLR              = args.fineLR
+    patchSize           = args.patchSize
 
     skipGauss           = args.skipGauss
     randomPatchNum      = args.randomPatchNum
     stdMultGauss        = args.stdMultGauss
     untilExtract        = args.untilExtract
+
+    skipFineDenoise     = args.skipFineDenoise
     # 2. Directory, path.
     coarseSavePrefix    = workspaceDIR + 'coarseModel/' + 'model'
     fineSavePrefix      = workspaceDIR + 'fineModel/' + 'model'

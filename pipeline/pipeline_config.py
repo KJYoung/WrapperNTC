@@ -22,7 +22,7 @@ def parse_args_standard():
     parser.add_argument('--fineEpochs', default=400, type=int, help='fine denoiser training epochs (default: 400).')
     parser.add_argument('--fineBatch', default=4, type=int, help='fine denoiser training batch size (default: 4).')
     parser.add_argument('--fineLR', default=0.002, type=float, help='fine denoiser training learning rate (* default: 0.002 *).')
-    
+    parser.add_argument('-s', '--patchSize', type=int, default=-1, help='denoises micrographs in patches of this size. not used if <1 (default: -1)')
     # for standard.
     parser.add_argument('--coarseEpochs', default=100, type=int, help='coarse denoiser training epochs (default: 100).')
     # for random, randgauss.
@@ -42,7 +42,8 @@ def parse_args_standard():
     parser.add_argument('--noiseReweight', default='', type=str, help='already reweighted noisy patches path to skip step 6 partially.')
     parser.add_argument('--bulkRenamed', default='', type=str, help='already paired bulkRenamed clean patches path to skip step 7 partially.')
     parser.add_argument('--fineModel', default='', type=str, help='already trained fine denoiser path to skip step 1~7 entirely.')
-    
+    parser.add_argument('--skipFineDenoise', dest='skipFineDenoise', action='store_true', help='skip the final fine denoising steps.')
+
     # Debugging Options.
     parser.add_argument('--extractDraw', dest='extractDraw', action='store_true', help='save noiseDraw during step 3 if this option is flagged.')
     parser.add_argument('--synGrid',     dest='synGrid',     action='store_true', help='save overview grid during step 5 if this option is flagged.')
