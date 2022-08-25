@@ -40,7 +40,6 @@ def parse_args_standard():
     parser.add_argument('--fragmentNoisy', default='', type=str, help='already fragmented noise patches path to skip step 6 partially,')
     parser.add_argument('--fragmentClean', default='', type=str, help='already fragmented clean patches path to skip step 6 partially,')
     parser.add_argument('--noiseReweight', default='', type=str, help='already reweighted noisy patches path to skip step 6 partially.')
-    parser.add_argument('--bulkRenamed', default='', type=str, help='already paired bulkRenamed clean patches path to skip step 7 partially.')
     parser.add_argument('--fineModel', default='', type=str, help='already trained fine denoiser path to skip step 1~7 entirely.')
     parser.add_argument('--skipFineDenoise', dest='skipFineDenoise', action='store_true', help='skip the final fine denoising steps.')
 
@@ -207,15 +206,6 @@ def check_args(args):
         if not args.noiseReweight.endswith('/'):
             print('WARNING : noiseReweight option should end with "/"!')
             args.noiseReweight = args.noiseReweight + '/'
-
-    # --bulkRenamed
-    if not args.bulkRenamed == '':
-        if not os.path.exists(args.bulkRenamed):
-            print('bulkRenamed directory does not exist!')
-            quit()
-        if not args.bulkRenamed.endswith('/'):
-            print('WARNING : bulkRenamed option should end with "/"!')
-            args.bulkRenamed = args.bulkRenamed + '/'
     
     # --fineModel
     if not args.fineModel == '':

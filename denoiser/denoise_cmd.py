@@ -66,12 +66,13 @@ def add_arguments(parser):
     parser.add_argument('--num-workers', default=16, type=int, help='number of threads to use for loading data during training (default: 16)')
     parser.add_argument('-j', '--num-threads', type=int, default=0, help='number of threads for pytorch, 0 uses pytorch defaults, <0 uses all cores (default: 0)')
 
+    parser.add_argument('--augmented', action='store_true', help='find the corresponding clean image more tolerantly.')
     return parser
 
 import denoise as dn
 from utils.image import save_image
 
-def make_paired_images_datasets(dir_a, dir_b, crop, random=np.random, holdout=0.1, preload=False, cutoff=0):
+def augmented_paired_datasets(dir_a, dir_b, crop, random=np.random, holdout=0.1, preload=False, cutoff=0):
     # train denoising model
     # make the dataset
     A = []
@@ -79,8 +80,11 @@ def make_paired_images_datasets(dir_a, dir_b, crop, random=np.random, holdout=0.
     for path in glob.glob(dir_a + os.sep + '*.mrc'):
         name = os.path.basename(path)
         A.append(path)
-        B.append(dir_b + os.sep + name)
+        B.append(dir_b + name[:-6] + ".mrc")
 
+    # print("A:" , A[:10], " length :", len(A))
+    # print("B:", B[:10], " length :", len(B))
+    
     # randomly hold out some image pairs for validation
     n = int(holdout*len(A))
     order = random.permutation(len(A))
@@ -103,6 +107,37 @@ def make_paired_images_datasets(dir_a, dir_b, crop, random=np.random, holdout=0.
 
     return dataset_train, dataset_val
 
+def make_paired_images_datasets(dir_a, dir_b, crop, random=np.random, holdout=0.1, preload=False, cutoff=0):
+    # train denoising model
+    # make the dataset
+    A = []
+    B = []
+    for path in glob.glob(dir_a + os.sep + '*.mrc'):
+        name = os.path.basename(path)
+        A.append(path)
+        B.append(dir_b + name)
+
+    # randomly hold out some image pairs for validation
+    n = int(holdout*len(A))
+    order = random.permutation(len(A))
+
+    A_train, A_val = [], []
+    B_train, B_val = [], []
+    
+    for i in range(n):
+        A_val.append(A[order[i]])
+        B_val.append(B[order[i]])
+    for i in range(n, len(A)):
+        A_train.append(A[order[i]])
+        B_train.append(B[order[i]])
+
+    print('# training with', len(A_train), 'image pairs', file=sys.stderr)
+    print('# validating on', len(A_val), 'image pairs', file=sys.stderr)
+
+    dataset_train = dn.PairedImages(A_train, B_train, crop=crop, xform=True, preload=preload, cutoff=cutoff)
+    dataset_val = dn.PairedImages(A_val, B_val, crop=crop, preload=preload, cutoff=cutoff)
+
+    return dataset_train, dataset_val
 
 def make_images_datasets(dir_a, dir_b, crop, random=np.random, holdout=0.1, cutoff=0):
     # train denoising model
@@ -192,20 +227,24 @@ def main(args):
 
     do_train = (args.dir_a is not None and args.dir_b is not None)
     if do_train:
-        preload = args.preload
-        holdout = args.holdout # fraction of image pairs to holdout for validation
+        preload   = args.preload
+        holdout   = args.holdout # fraction of image pairs to holdout for validation
 
-        #use dirA/dirB
-        crop = args.crop
-        dir_as = args.dir_a
-        dir_bs = args.dir_b
+        # use dirA/dirB
+        crop      = args.crop
+        dir_as    = args.dir_a
+        dir_bs    = args.dir_b
+        augmented = args.augmented
 
         dset_train = []
-        dset_val = []
+        dset_val   = []
 
         for dir_a, dir_b in zip(dir_as, dir_bs): 
             random = np.random.RandomState(44444)
-            dataset_train, dataset_val = make_paired_images_datasets(dir_a, dir_b, crop, random=random, holdout=holdout, preload=preload , cutoff=cutoff)
+            if augmented:
+                dataset_train, dataset_val = augmented_paired_datasets(dir_a, dir_b, crop, random=random, holdout=holdout, preload=preload , cutoff=cutoff)
+            else:
+                dataset_train, dataset_val = make_paired_images_datasets(dir_a, dir_b, crop, random=random, holdout=holdout, preload=preload , cutoff=cutoff)
             dset_train.append(dataset_train)
             dset_val.append(dataset_val)
 

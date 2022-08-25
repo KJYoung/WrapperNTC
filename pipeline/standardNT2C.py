@@ -88,18 +88,10 @@ def step6FragmentReweight():
             print("----Step 6-3 : Noise reweighting was not successfully finished with error code {}".format(status6_3))
             quit()
 
-def step7BulkrenameFinetrain():
-    if bulkRenamed == '':
-        if not os.path.exists(bulkRenamedDIR):
-            os.makedirs(bulkRenamedDIR)
-        status7_1 = os.system(f'python {NT2CDIR}workUtil/bulkRenamer.py {fragmentCleanDIR} {bulkRenamedDIR} {augNum}')
-        if status7_1 != 0:
-            print("----Step 7-1 : Bulk renaming was not successfully finished with error code {}".format(status7_1))
-            quit()
-
+def step7Finetrain():
     if not os.path.exists(fineModelDIR):      # directory for fine Denoiser models.
         os.makedirs(fineModelDIR)
-    status7_2 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -a {noiseReweightDIR} -b {bulkRenamedDIR} -d {cudaDevice} -c 512 --num-epochs {fineEpochs} --lr {fineLR} --batch-size {fineBatch} --save-prefix {fineSavePrefix} > {workspaceDIR}fineSTDOUT.log')
+    status7_2 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -a {noiseReweightDIR} -b {fragmentCleanDIR} -d {cudaDevice} -c 512 --num-epochs {fineEpochs} --lr {fineLR} --batch-size {fineBatch} --save-prefix {fineSavePrefix} --augmented > {workspaceDIR}fineSTDOUT.log')
     if status7_2 != 0:
         print("----Step 7-2 : Fine denoiser training was not successfully finished with error code {}".format(status7_2))
         return -1
@@ -259,14 +251,14 @@ def standardWorkflow():
     else:
         step6FragmentReweight()
         print("----Elapsed time for step 6 : {} seconds".format(time.time() - step6StartTime))
-    # 7. Bulk rename and Fine Denoiser training. ############################################################################################
-    print("--Step 7 : Bulk rename and Fine Denoiser training! -----------------------------------------")
+    # 7. Fine Denoiser training. ############################################################################################
+    print("--Step 7 : Fine Denoiser training! -----------------------------------------")
     step7StartTime      = time.time()
 
     if skipStep7:
         print('---- Step 7 skipped.')
     else:
-        retVal = step7BulkrenameFinetrain()
+        retVal = step7Finetrain()
         print("----Elapsed time for step 7 : {} seconds".format(time.time() - step7StartTime))
     
     
@@ -328,12 +320,12 @@ def randomWorkflow(withGaussain=False):
         step6FragmentReweight()
         print("----Elapsed time for step 4 : {} seconds".format(time.time() - step4StartTime))
     # 5. Bulk rename and Fine Denoiser training. ############################################################################################
-    print("--Step 5 : Bulk rename and Fine Denoiser training! -----------------------------------------")
+    print("--Step 5 : Fine Denoiser training! -----------------------------------------")
     step5StartTime      = time.time()
     if skipStep5:
         print('---- Step 5 skipped.')
     else:
-        retVal = step7BulkrenameFinetrain()
+        retVal = step7Finetrain()
         print("----Elapsed time for step 5 : {} seconds".format(time.time() - step5StartTime))
     
     
@@ -380,7 +372,6 @@ if __name__ == '__main__':
     fragmentNoisy       = args.fragmentNoisy
     noiseReweight       = args.noiseReweight
     augNum              = args.augNum
-    bulkRenamed         = args.bulkRenamed
     fineModel           = args.fineModel
     fineEpochs          = args.fineEpochs
     fineBatch           = args.fineBatch
@@ -407,7 +398,6 @@ if __name__ == '__main__':
     fragmentCleanDIR    = (workspaceDIR + 'fragmentClean/')          if fragmentClean == ''  else fragmentClean
     noiseReweightDIR    = (workspaceDIR + 'noiseReweight/')          if noiseReweight == ''  else noiseReweight
     synNoiseDIR         = (workspaceDIR + 'synthesized_noises/')     if synNoise == ''       else synNoise
-    bulkRenamedDIR      = (workspaceDIR + 'fragmentPairedClean/')    if bulkRenamed == ''    else bulkRenamed
     fineModelDIR        = (workspaceDIR + 'fineModel/')
     fineDenoisedDIR     = (workspaceDIR + 'fineDenoised/')
 
