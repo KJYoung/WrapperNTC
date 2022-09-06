@@ -6,7 +6,7 @@ def parse_args_standard():
     parser = argparse.ArgumentParser(description="Improved Wrapper of NoiseTransfer2Clean.")
     
     # Workflow selection
-    parser.add_argument('-w', '--workflow', choices=['standard', 'random', 'randgauss'], default='standard', help='choose the workflow (default: standard).')
+    parser.add_argument('-w', '--workflow', choices=['standard', 'random', 'randgauss', 'stochastic'], default='standard', help='choose the workflow (default: standard).')
 
     # Basic Parameters
     parser.add_argument('--nt2cDir', required=True, help='path to nt2c.')
@@ -30,7 +30,9 @@ def parse_args_standard():
     # for randgauss.
     parser.add_argument('--stdMultGauss', default=10.0, type=float, help='multiplication factor to clean images\' std(default: 10.0).')
     parser.add_argument('--skipGauss', dest='skipGauss', action='store_true', help='skip Gauss applier(already done).')
-
+    # for stochastic.
+    parser.add_argument('--stocAug', default=5, type=int, help='stochastic augmentation number (default: 5).')
+    
     # Bypass Options.
     parser.add_argument('--coarseModel', default='', type=str, help='already trained coarse denoiser model path to skip step 1.')
     parser.add_argument('--coarseDenoised', default='', type=str, help='already coarse denoised inputs path to skip step 1~2.')

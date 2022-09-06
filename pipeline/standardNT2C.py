@@ -114,7 +114,7 @@ def step8FineDenoise(skipStep7):
         print("----Step 8 was not successfully finished with error code {}".format(status8))
         quit()
 
-def randomExtract():
+def randomExtract(stochasticExtract=False):
     if not os.path.exists(noisePatchDIR):       # directory for extracted noise patches.
         os.makedirs(noisePatchDIR)
     if extractDraw:
@@ -122,7 +122,10 @@ def randomExtract():
             os.makedirs(noiseDrawDIR)
 
     noiseDrawOption = '' if extractDraw == False else f'--noiseDraw {noiseDrawDIR}'
-    statusRE = os.system(f'python {NT2CDIR}script/randomExtract.py --denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 -n {randomPatchNum} 2> {workspaceDIR}noiseExtractSTDERR.log')
+    if stochasticExtract:
+        statusRE = os.system(f'python {NT2CDIR}script/stochasticExtract.py --denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 -n {randomPatchNum} -a {stocAug} 2> {workspaceDIR}noiseExtractSTDERR.log')
+    else:
+        statusRE = os.system(f'python {NT2CDIR}script/randomExtract.py --denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 -n {randomPatchNum} 2> {workspaceDIR}noiseExtractSTDERR.log')
     if statusRE != 0:
         print("----Random Extract was not successfully finished with error code {}".format(statusRE))
         quit()
@@ -182,7 +185,6 @@ def summaryWriter(step1, step2, step3, step4, step5, step6, step7, step8):
         resultLOG.write("fragmentNoisy          : {}\n".format(fragmentNoisy))
         resultLOG.write("fragmentClean          : {}\n".format(fragmentClean))
         resultLOG.write("noiseReweight          : {}\n".format(noiseReweight))
-        resultLOG.write("bulkRenamed            : {}\n".format(bulkRenamed))
         resultLOG.write("fineModel              : {}\n".format(fineModel))
         resultLOG.write("\n\n")
         resultLOG.write("DEBUGGING PARAMETERS ==========================\n")
@@ -276,7 +278,7 @@ def standardWorkflow():
     summaryWriter(step1StartTime, step2StartTime, step3StartTime, step4StartTime, step5StartTime, step6StartTime, step7StartTime, step8StartTime)
     print(f"---- Result Log is saved to {workspaceDIR}summary.txt.")
 
-def randomWorkflow(withGaussain=False):
+def randomWorkflow(withGaussain=False, stochasticExtract=False):
     skipStep1           = False if (noisePatch == '') and (synNoise == '') and (fineModel == '') else True
     skipStep2           = False if (loadGenerator == '') and (synNoise == '') and (fineModel == '') else True
     skipStep3           = False if (synNoise == '') and (fineModel == '') else True
@@ -288,7 +290,7 @@ def randomWorkflow(withGaussain=False):
     if skipStep1:
         print("---- Step 1 skipped.")
     else:
-        randomExtract()
+        randomExtract(stochasticExtract=stochasticExtract)
         print("----Elapsed time for step 1 : {} seconds".format(time.time() - step1StartTime))
     
     # 2. GAN noise synthesizer training. ####################################################################################################
@@ -377,6 +379,7 @@ if __name__ == '__main__':
     fineBatch           = args.fineBatch
     fineLR              = args.fineLR
     patchSize           = args.patchSize
+    stocAug             = args.stocAug
 
     skipGauss           = args.skipGauss
     randomPatchNum      = args.randomPatchNum
@@ -407,5 +410,7 @@ if __name__ == '__main__':
         randomWorkflow()
     elif workflow == 'randgauss':
         randomWorkflow(withGaussain = True)
+    elif workflow == 'stochastic':
+        randomWorkflow(stochasticExtract = True)
     else:
         print("ERROR : There is no {} workflow".format(workflow))
