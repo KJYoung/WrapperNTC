@@ -2,6 +2,21 @@ from pipeline_config import parse_args_standard
 import os, time
 import numpy as np
 
+class ResultReporter():
+    def __init__(self, fileName):
+        self.resultLOG = open(fileName, "w")
+        self.sectionNum = 1
+    
+    def startSection(self, sectionName):
+        self.resultLOG.write(f"-- Section {self.sectionNum} : {sectionName}\n")
+    
+    def writeParam(self, paramName, paramValue):
+        self.resultLOG.write(f"{paramName} : {paramValue}\n")
+
+    def endReport(self):
+        # self.resultLOG.write("\n\n")
+        self.resultLOG.close()
+
 def step1CoarseTrain():
     if not os.path.exists(coarseModelDIR):      # directory for coarse denoiser models.
         os.makedirs(coarseModelDIR)
@@ -141,26 +156,29 @@ def gaussApplication():
         quit()
 
 def summaryWriter(step1, step2, step3, step4, step5, step6, step7, step8):
-    with open(f"{workspaceDIR}summary.txt", "w") as resultLOG:
-        resultLOG.write("WORKFLOW : {}\n".format(workflow))
-        resultLOG.write("---------- SUMMARY 1 : time statistics ---------------------------------------------------\n")
-        resultLOG.write("Elapsed time for step1 : {}\n".format(step2 - step1))
-        resultLOG.write("Elapsed time for step2 : {}\n".format(step3 - step2))
-        resultLOG.write("Elapsed time for step3 : {}\n".format(step4 - step3))
-        resultLOG.write("Elapsed time for step4 : {}\n".format(step5 - step4))
-        resultLOG.write("Elapsed time for step5 : {}\n".format(step6 - step5))
-        if step7:
-            resultLOG.write("Elapsed time for step6 : {}\n".format(step7 - step6))
-        else:
-            resultLOG.write("Elapsed time for step6 : {}\n".format(time.time() - step6))
+    if step7:
+        pass
+    else:
+        step7 : time.time()
 
-        if step8:
-            resultLOG.write("Elapsed time for step7 : {}\n".format(step8 - step7))
-            resultLOG.write("Elapsed time for step8 : {}\n".format(time.time() - step8))
-        resultLOG.write("Total Elapsed time     : {}\n".format(time.time() - pipelineStartTime))
-        resultLOG.write("\n\n")
-        resultLOG.write("---------- SUMMARY 2 : parameters statistics ---------------------------------------------\n")
-        resultLOG.write("BASIC PARAMETERS ==========================\n")
+    resultReporter = ResultReporter(f"{workspaceDIR}summary.txt")
+    
+    resultReporter.startSection("Time statistics")
+    resultReporter.writeParam("Workflow", workflow)
+    resultReporter.writeParam("Elapsed time for step1", step2-step1)
+    resultReporter.writeParam("Elapsed time for step2", step3-step2)
+    resultReporter.writeParam("Elapsed time for step3", step4-step3)
+    resultReporter.writeParam("Elapsed time for step4", step5-step4)
+    resultReporter.writeParam("Elapsed time for step5", step6-step5)
+    resultReporter.writeParam("Elapsed time for step6", step7-step6)
+    if step8:
+        resultReporter.writeParam("Elapsed time for step7", step8-step7)
+        resultReporter.writeParam("Elapsed time for step8", time.time()-step8)
+    resultReporter.writeParam("Total elapsed time", time.time() - pipelineStartTime)
+
+    resultReporter.startSection("Basic parameters")
+    resultReporter.endReport()
+    with open(f"{workspaceDIR}summary.txt", "a") as resultLOG:
         resultLOG.write("used NT2CDIR           : {}\n".format(NT2CDIR))
         resultLOG.write("workspaceDIR           : {}\n".format(workspaceDIR))
         resultLOG.write("cleanDataDIR           : {}\n".format(cleanDIR))
@@ -186,6 +204,8 @@ def summaryWriter(step1, step2, step3, step4, step5, step6, step7, step8):
         resultLOG.write("fragmentClean          : {}\n".format(fragmentClean))
         resultLOG.write("noiseReweight          : {}\n".format(noiseReweight))
         resultLOG.write("fineModel              : {}\n".format(fineModel))
+        resultLOG.write("stocAug                : {}\n".format(stocAug))
+        resultLOG.write("randomPatchNum         : {}\n".format(randomPatchNum))
         resultLOG.write("\n\n")
         resultLOG.write("DEBUGGING PARAMETERS ==========================\n")
         resultLOG.write("extractDraw            : {}\n".format(extractDraw))
@@ -354,8 +374,7 @@ if __name__ == '__main__':
     
     NT2CDIR             = args.nt2cDir
     workspaceDIR        = args.workspace
-    cleanDIR            = args.clean
-    noisyDIR            = args.noisy
+    cleanDIR, noisyDIR  = args.clean, args.noisy
     cudaDevice          = args.device
     coarseEpochs        = args.coarseEpochs
     rawDataDIR          = args.raw
@@ -370,8 +389,7 @@ if __name__ == '__main__':
     synNum64            = args.synNum64
     synGrid             = args.synGrid
     trainGrid           = args.trainGrid
-    fragmentClean       = args.fragmentClean
-    fragmentNoisy       = args.fragmentNoisy
+    fragmentClean, fragmentNoisy = args.fragmentClean, args.fragmentNoisy
     noiseReweight       = args.noiseReweight
     augNum              = args.augNum
     fineModel           = args.fineModel

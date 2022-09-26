@@ -7,3 +7,5 @@
 (2022/07/12) After verification of RANDOM, RandGauss. Clean Repository.   
 (2022/07/21) After verification of tomsimGaussV3. Clean. Reoranize. Integrate workflow.   
 (2022/08/25) Clean. Remove BulkRenamer.   
+(2022/09/26) Stochastic Extract Ended. Started to replace U-net.   
+TODO : Clean Extract / Reorganize Report in Extract / More clean standardNT2C.py

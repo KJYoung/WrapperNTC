@@ -145,7 +145,7 @@ if __name__ == "__main__":
         for process in multiprocessing.active_children():
             print(process.name, process.is_alive())
     elif worker == 1:
-        processInputsReport(0, input_list)
+        processInputs(0, input_list)
     else:
         print("Worker should be >= 1.")
         assert False
