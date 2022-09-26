@@ -18,26 +18,16 @@ def load_model(name):
     # set the name aliases
     if name == 'unet':
         name = 'unet_L2_v0.2.2.sav'
-    elif name == 'unet-small':
-        name = 'unet_small_L1_v0.2.2.sav'
-    elif name == 'fcnn':
-        name = 'fcnn_L1_v0.2.2.sav'
-    elif name == 'affine':
-        name = 'affine_L1_v0.2.2.sav'
-    elif name == 'unet-v0.2.1':
-        name = 'unet_L2_v0.2.1.sav'
+    elif name == 'xunet':
+        name = 'xunet.sav'
 
     # construct model and load the state
-    if name == 'unet_L2_v0.2.1.sav':
-        model = UDenoiseNet(base_width=7, top_width=3)
-    elif name == 'unet_L2_v0.2.2.sav':
+    if name == 'unet_L2_v0.2.2.sav':
         model = UDenoiseNet(base_width=11, top_width=5)
-    elif name == 'unet_small_L1_v0.2.2.sav':
-        model = UDenoiseNetSmall(width=11, top_width=5)
-    elif name == 'fcnn_L1_v0.2.2.sav':
-        model = DenoiseNet2(64, width=11)
-    elif name == 'affine_L1_v0.2.2.sav':
-        model = AffineDenoise(max_size=31)
+    # elif name == 'unet_L2_v0.2.1.sav':
+    #     model = UDenoiseNet(base_width=7, top_width=3)
+    elif name == 'xunet':
+        model = None
     else:
         # if not set to a pretrained model, try loading path directly
         return torch.load(name)
@@ -99,55 +89,6 @@ def denoise_patches(model, x, patch_size, padding=128):
                 y[i:i+patch_size,j:j+patch_size] = yij[si:si+patch_size,sj:sj+patch_size]
 
     return y
-
-class DenoiseNet(nn.Module):
-    def __init__(self, base_filters):
-        super(DenoiseNet, self).__init__()
-
-        self.base_filters = base_filters
-        nf = base_filters
-        self.net = nn.Sequential( nn.Conv2d(1, nf, 11, padding=5)
-                                , nn.LeakyReLU(0.1)
-                                , nn.MaxPool2d(3, stride=1, padding=1)
-                                , nn.Conv2d(nf, 2*nf, 3, padding=2, dilation=2)
-                                , nn.LeakyReLU(0.1)
-                                , nn.Conv2d(2*nf, 2*nf, 3, padding=4, dilation=4)
-                                , nn.LeakyReLU(0.1)
-                                , nn.Conv2d(2*nf, 3*nf, 3, padding=1)
-                                , nn.LeakyReLU(0.1)
-                                , nn.MaxPool2d(3, stride=1, padding=1)
-                                , nn.Conv2d(nf, 2*nf, 3, padding=2, dilation=2)
-                                , nn.LeakyReLU(0.1)
-                                , nn.Conv2d(3*nf, 3*nf, 3, padding=4, dilation=4)
-                                , nn.LeakyReLU(0.1)
-                                , nn.Conv2d(3*nf, 1, 7, padding=3)
-                                )
-
-    def forward(self, x):
-        return self.net(x)
-
-
-class DenoiseNet2(nn.Module):
-    def __init__(self, base_filters, width=11):
-        super(DenoiseNet2, self).__init__()
-
-        self.base_filters = base_filters
-        nf = base_filters
-        self.net = nn.Sequential( nn.Conv2d(1, nf, width, padding=width//2)
-                                , nn.LeakyReLU(0.1)
-                                , nn.Conv2d(nf, nf, width, padding=width//2)
-                                , nn.LeakyReLU(0.1)
-                                , nn.Conv2d(nf, 1, width, padding=width//2)
-                                )
-
-    def forward(self, x):
-        return self.net(x)
-
-
-class Identity(nn.Module):
-    def forward(self, x):
-        return x
-
 
 class UDenoiseNet(nn.Module):
     # U-net from noise2noise paper
