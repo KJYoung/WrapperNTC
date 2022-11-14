@@ -81,9 +81,6 @@ def augmented_paired_datasets(dir_a, dir_b, crop, random=np.random, holdout=0.1,
         name = os.path.basename(path)
         A.append(path)
         B.append(dir_b + name[:-6] + ".mrc")
-
-    # print("A:" , A[:10], " length :", len(A))
-    # print("B:", B[:10], " length :", len(B))
     
     # randomly hold out some image pairs for validation
     n = int(holdout*len(A))
@@ -274,7 +271,6 @@ def main(args):
         num_workers = args.num_workers
 
         print('epoch', 'loss_train', 'loss_val')
-        #criteria = nn.L1Loss()
         criteria = args.criteria
         
         iterator = dn.train_noise2noise(model, dataset_train, lr=lr, optim=optim
