@@ -40,6 +40,9 @@ def normalize(raw_DIR, norm_DIR, msg=""):
             mrc.set_data(norm_a)
 
 # normalize("/cdata/benchDIR/bench10077_27/", "/cdata/thesis/norm/bench10077_27/")
-normalize(Back_DIR, Sign_OUT)
+# normalize("/cdata/thesis/rawBack/", "/cdata/thesis/norm/rawBack/")
+# normalize("/cdata/thesis/rawSign/", "/cdata/thesis/norm/rawSign/")
+
+normalize(Back_DIR, Back_OUT)
 normalize(Sign_DIR, Sign_OUT)
 normalize(Whole_DIR, Whole_OUT)
