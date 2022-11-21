@@ -8,6 +8,8 @@
 (2022/07/21) After verification of tomsimGaussV3. Clean. Reoranize. Integrate workflow.   
 (2022/08/25) Clean. Remove BulkRenamer.   
 (2022/09/26) Stochastic Extract Ended. Started to replace U-net.   
+(2022/11/21) PSNR evaluation on REAL dataset.   
+
 ## TODO
 1. Clean Extract
 2. Reorganize Report in Extract

@@ -17,17 +17,29 @@ class ResultReporter():
         # self.resultLOG.write("\n\n")
         self.resultLOG.close()
 
-def step1CoarseTrain():
-    if not os.path.exists(coarseModelDIR):      # directory for coarse denoiser models.
-        os.makedirs(coarseModelDIR)
-    status1 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -a {noisyDIR} -b {cleanDIR} -d {cudaDevice} -c 800 --num-epochs {coarseEpochs} --save-prefix {coarseSavePrefix} > {workspaceDIR}coarseSTDOUT.log')
-    if status1 != 0:
-        print("----Step 1 was not successfully finished with error code {}".format(status1))
+def dir_prepare(dir_string):
+    if not os.path.exists(dir_string):
+        os.makedirs(dir_string)
+
+def check_status(status, msg=""):
+    if status != 0:
+        print(f"{msg} with error code {status}")
         quit()
 
+def denoise_cmd(param_string):
+    return os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py {param_string}')
+
+def extract_cmd(param_string):
+    return os.system(f'python {NT2CDIR}script/extractScript.py {param_string}')
+
+def step1CoarseTrain():
+    dir_prepare(coarseModelDIR) # directory for coarse denoiser models.
+
+    status1 = denoise_cmd(f'-a {noisyDIR} -b {cleanDIR} -d {cudaDevice} -c 800 --num-epochs {coarseEpochs} --save-prefix {coarseSavePrefix} > {workspaceDIR}coarseSTDOUT.log')
+    check_status(status1, "----Step 1 was not successfully finished")
+
 def step2CoraseDenoise(skipStep1):
-    if not os.path.exists(coarseDenoisedDIR):   # directory for coarse denoised Raw micrographs.
-        os.makedirs(coarseDenoisedDIR)
+    dir_prepare(coarseDenoisedDIR):   # directory for coarse denoised Raw micrographs.
     
     if skipStep1:
         coarseModelPath = coarseModel
@@ -36,24 +48,17 @@ def step2CoraseDenoise(skipStep1):
         coarseModelPath = coarseSavePrefix + ('_epoch{:0'+str(digits)+'}.sav').format(coarseEpochs)
     
     patchSizeParam = "" if patchSize == -1 else f"-s {patchSize}"
-    status2 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -o {coarseDenoisedDIR} -m {coarseModelPath} -d {cudaDevice} {patchSizeParam} {rawDataDIR}*.mrc')
-    
-    if status2 != 0:
-        print("----Step 2 was not successfully finished with error code {}".format(status2))
-        quit()
+    status2 = denoise_cmd(f'-o {coarseDenoisedDIR} -m {coarseModelPath} -d {cudaDevice} {patchSizeParam} {rawDataDIR}*.mrc')
+    check_status(status1, "----Step 2 was not successfully finished")
 
 def step3NoiseExtract():
-    if not os.path.exists(noisePatchDIR):       # directory for extracted noise patches.
-        os.makedirs(noisePatchDIR)
+    dir_prepare(noisePatchDIR):       # directory for extracted noise patches.
     if extractDraw:
-        if not os.path.exists(noiseDrawDIR):    # directory for visualization of extraction.
-            os.makedirs(noiseDrawDIR)
+        dir_prepare(noiseDrawDIR):    # directory for visualization of extraction.
 
     noiseDrawOption = '' if extractDraw == False else f'--noiseDraw {noiseDrawDIR}'
-    status3 = os.system(f'python {NT2CDIR}script/extractScript.py --denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 2> {workspaceDIR}noiseExtractSTDERR.log')
-    if status3 != 0:
-        print("----Step 3 was not successfully finished with error code {}".format(status3))
-        quit()
+    status3 = extract_cmd(f'--denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 2> {workspaceDIR}noiseExtractSTDERR.log')
+    check_status(status3, "----Step 3 was not successfully finished")
 
 def step4GANtrain():
     GANtrainDataDIR = (workspaceDIR + "noisePatch/") if noisePatch == "" else noisePatch
@@ -62,10 +67,7 @@ def step4GANtrain():
     cudaParam      = "True" if cudaDevice >= 0 else "False"
 
     status4 = os.system(f'{CUDA_ENV_Param} python {NT2CDIR}synthesizer/main_savemrc_512.py --batch_size 16 --dataroot {GANtrainDataDIR} --cuda {cudaParam} --generator_iters {generatorIter} --output_dir {workspaceDIR} {trainGridParam} > {workspaceDIR}GANtrain{generatorIter}.log 2> {workspaceDIR}GANtrainSTDERR.log')
-        
-    if status4 != 0:
-        print("----Step 4 was not successfully finished with error code {}".format(status4))
-        quit()
+    check_status(status4, "----Step 4 was not successfully finished")
 
 def step5GANsynthesize():
     synGridParam = "--synGrid" if synGrid else ""
@@ -73,48 +75,38 @@ def step5GANsynthesize():
     cudaParam      = "True" if cudaDevice >= 0 else "False"
 
     status5 = os.system(f'{CUDA_ENV_Param} python {NT2CDIR}synthesizer/main_generateV_512.py --batch_size 64 --dataroot / --cuda {cudaParam} --output_dir {workspaceDIR} --load_G {generatorPath} --synNum64 {synNum64} {synGridParam} 2> /dev/null')
-        
-    if status5 != 0:
-        print("----Step 5 was not successfully finished with error code {}".format(status5))
-        quit()
+    check_status(status5, "----Step 5 was not successfully finished")
 
 def step6FragmentReweight():
     if fragmentNoisy == '': # Fragment Noisy
-        if not os.path.exists(fragmentNoisyDIR):       # directory for fragmented noisy patches.
-            os.makedirs(fragmentNoisyDIR)
+        dir_prepare(fragmentNoisyDIR):       # directory for fragmented noisy patches.
+
         status6_1 = os.system(f'python {NT2CDIR}workUtil/fragmentWrapper.py -s 512 -d {noisyDIR} -id {fragmentNoisyDIR}')
-        if status6_1 != 0:
-            print("----Step 6-1 : Noisy Fragmentation was not successfully finished with error code {}".format(status6_1))
-            quit()
+        check_status(status6_1, "----Step 6_1[Noisy Fragmentation] was not successfully finished")
     
     if fragmentClean == '': # Fragment Clean
-        if not os.path.exists(fragmentCleanDIR):       # directory for fragmented clean patches.
-            os.makedirs(fragmentCleanDIR)
+        dir_prepare(fragmentCleanDIR):       # directory for fragmented clean patches.
+
         status6_2 = os.system(f'python {NT2CDIR}workUtil/fragmentWrapper.py -s 512 -d {cleanDIR} -id {fragmentCleanDIR}')
-        if status6_2 != 0:
-            print("----Step 6-2 : Clean Fragmentation was not successfully finished with error code {}".format(status6_2))
-            quit()
+        check_status(status6_2, "----Step 6_2[Clean Fragmentation] was not successfully finished")
     
     if noiseReweight == '': # Noise reweight
-        if not os.path.exists(noiseReweightDIR):
-            os.makedirs(noiseReweightDIR)
+        dir_prepare(noiseReweightDIR):
+
         status6_3 = os.system(f'python {NT2CDIR}script/noise_reweight.py {fragmentCleanDIR} {synNoiseDIR} {fragmentNoisyDIR} {noiseReweightDIR} {augNum}')
-        if status6_3 != 0:
-            print("----Step 6-3 : Noise reweighting was not successfully finished with error code {}".format(status6_3))
-            quit()
+        check_status(status6_3, "----Step 6_3[Noise Reweight] was not successfully finished")
 
 def step7Finetrain():
-    if not os.path.exists(fineModelDIR):      # directory for fine Denoiser models.
-        os.makedirs(fineModelDIR)
-    status7_2 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -a {noiseReweightDIR} -b {fragmentCleanDIR} -d {cudaDevice} -c 512 --num-epochs {fineEpochs} --lr {fineLR} --batch-size {fineBatch} --save-prefix {fineSavePrefix} --augmented > {workspaceDIR}fineSTDOUT.log')
+    dir_prepare(fineModelDIR):      # directory for fine Denoiser models.
+
+    status7_2 = denoise_cmd(f'-a {noiseReweightDIR} -b {fragmentCleanDIR} -d {cudaDevice} -c 512 --num-epochs {fineEpochs} --lr {fineLR} --batch-size {fineBatch} --save-prefix {fineSavePrefix} --augmented > {workspaceDIR}fineSTDOUT.log')
     if status7_2 != 0:
         print("----Step 7-2 : Fine denoiser training was not successfully finished with error code {}".format(status7_2))
         return -1
     return 0
 
 def step8FineDenoise(skipStep7):
-    if not os.path.exists(fineDenoisedDIR):   # directory for fine denoised Raw micrographs.
-        os.makedirs(fineDenoisedDIR)
+    dir_prepare(fineDenoisedDIR):   # directory for fine denoised Raw micrographs.
         
     if skipStep7:
         fineModelPath = fineModel
@@ -123,37 +115,28 @@ def step8FineDenoise(skipStep7):
         fineModelPath = fineSavePrefix + ('_epoch{:0'+str(digits)+'}.sav').format(fineEpochs)
     
     patchSizeParam = "" if patchSize == -1 else f"-s {patchSize}"
-    status8 = os.system(f'python {NT2CDIR}denoiser/denoise_cmd.py -c 512 -o {fineDenoisedDIR} -m {fineModelPath} -d {cudaDevice} {patchSizeParam} {rawDataDIR}*.mrc')
-
-    if status8 != 0:
-        print("----Step 8 was not successfully finished with error code {}".format(status8))
-        quit()
+    status8 = denoise_cmd(f'-c 512 -o {fineDenoisedDIR} -m {fineModelPath} -d {cudaDevice} {patchSizeParam} {rawDataDIR}*.mrc')
+    check_status(status8, "----Step 8 was not successfully finished")
 
 def randomExtract(stochasticExtract=False):
-    if not os.path.exists(noisePatchDIR):       # directory for extracted noise patches.
-        os.makedirs(noisePatchDIR)
+    dir_prepare(noisePatchDIR):       # directory for extracted noise patches.
+
     if extractDraw:
-        if not os.path.exists(noiseDrawDIR):    # directory for visualization of extraction.
-            os.makedirs(noiseDrawDIR)
+        dir_prepare(noiseDrawDIR):    # directory for visualization of extraction.
 
     noiseDrawOption = '' if extractDraw == False else f'--noiseDraw {noiseDrawDIR}'
     if stochasticExtract:
         statusRE = os.system(f'python {NT2CDIR}script/stochasticExtract.py --denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 -n {randomPatchNum} -a {stocAug} 2> {workspaceDIR}noiseExtractSTDERR.log')
     else:
         statusRE = os.system(f'python {NT2CDIR}script/randomExtract.py --denoised {coarseDenoisedDIR} --raw {rawDataDIR} --noisePatch {noisePatchDIR} {noiseDrawOption} --worker {extractCore} -s 512 -n {randomPatchNum} 2> {workspaceDIR}noiseExtractSTDERR.log')
-    if statusRE != 0:
-        print("----Random Extract was not successfully finished with error code {}".format(statusRE))
-        quit()
+    check_status(statusRE, "----Step[Random Extract] was not successfully finished")
 
 def gaussApplication():
-    if not os.path.exists(noisyDIR):       # directory for gaussian noisy patches.
-        os.makedirs(noisyDIR)
+    dir_prepare(noisyDIR):       # directory for gaussian noisy patches.
 
     noiseDrawOption = '' if extractDraw == False else f'--noiseDraw {noiseDrawDIR}'
     statusGA = os.system(f'python {NT2CDIR}workUtil/gaussApplier.py -i {cleanDIR} -o {noisyDIR} -a 1 --std {stdMultGauss}')
-    if statusGA != 0:
-        print("----Gauss Application was not successfully finished with error code {}".format(statusGA))
-        quit()
+    check_status(statusGA, "----Step[Gauss Apply] was not successfully finished")
 
 def summaryWriter(step1, step2, step3, step4, step5, step6, step7, step8):
     if step7:
