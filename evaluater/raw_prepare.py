@@ -5,7 +5,7 @@ from math import floor, ceil
 import mrcfile
 from TARGET import back_patches, signal_patches
 import numpy as np
-
+from normalizer import normalize
 # USAGE ################################################################################
 # python raw_prepare.py [input_dir] [output_dir]
 # ex. python /cdata/NT2C/evaluate/raw_prepare.py /cdata/thesis/raw/whole/ /cdata/thesis/raw/
@@ -55,17 +55,6 @@ for file in signal_patches:
         with mrcfile.new(f"{outputSIGN_DIR}{file['file']}_{i}.mrc") as mrc:
             mrc.set_data(orig_ / np.max(orig_))
 
-
-A = []
-B = []
-for path in glob.glob(input_DIR + '*.mrc'):
-    name = os.path.basename(path)
-    A.append(path)
-    B.append(out_wholeNorm + name)
-
-for ins, outs in zip(A, B):
-    orig = mrcfile.open(f"{ins}", permissive=True).data.copy()
-    with mrcfile.new(f"{outs}") as mrc:
-        mrc.set_data(orig / np.max(orig))
+normalize(input_DIR, out_wholeNorm)
 
 print("---------------------------- Patch Extract Finished.")
