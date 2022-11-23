@@ -91,8 +91,8 @@ def calculate_pearsoncc(clean, denoised, msg=""):
         
         res = pearson_def(aa, bb)
         pncc.append(res)
-        logger.write(f"{res}")
+        logger.write(f"{res}\n")
         print(res)
-    logger.write(f"Result average : {np.mean(pncc)}")
+    logger.write(f"Result average : {np.mean(pncc)}\n")
     print(np.mean(pncc))
     logger.close()

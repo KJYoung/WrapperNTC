@@ -8,9 +8,9 @@ from metric_evaluater import calculate_metrics, calculate_pearsoncc
 import numpy as np
 from normalizer import normalize
 # USAGE ################################################################################
-# python evaluate.py [model_path] [output_dir] [skip_to_go_metric]
-# ex. python /cdata/NT2C/evaluater/evaluate.py /cdata/pipeTemp/fineModel/model_epoch500.sav /cdata/thesis/pipeTemp_500_fineDenoise_27/ 
-# ex. python /cdata/NT2C/evaluater/evaluate.py skip /cdata/thesis/topazGeneral/  (/cdata/thesis/topazGeneral/denoised/ should be filled with topaz denoised.)
+# python evaluateSIM.py [model_path] [output_dir] [skip_to_go_metric]
+# ex. Evaluate PSNR on Already normalized micrographs
+# python /cdata/NT2C/evaluater/evaluateSIM.py skip /cdata/thesis/simNorm/2wrj/noisyNorm/ /cdata/thesis/simEval/epoch0/ /cdata/thesis/simEval/epoch0/ true
 ########################################################################################
 
 #input
@@ -36,6 +36,6 @@ if skip_norm != 'true':
 print("---------------------------- Patch Norm Finished.")
 
 # 3. metric evaluater
-# calculate_metrics(raw_noisy, outputWHOLE_DIR, "whole")
-calculate_pearsoncc(raw_clean, denoised, "pipeGauss")
+calculate_metrics(raw_noisy, out_wholeNorm, "whole")
+# calculate_pearsoncc(raw_clean, denoised, "topazGeneral")
 print("---------------------------- Metric evaluation Finished. ")
